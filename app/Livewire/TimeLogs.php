@@ -19,6 +19,8 @@ class TimeLogs extends Component
     public $sort = 'desc';
     public $editingId = null;
     public $showModal = false;
+    public $showNotification = false;
+    public $notificationMessage = '';
 
     protected $rules = [
         'date' => 'required|date',
@@ -66,7 +68,7 @@ class TimeLogs extends Component
                 'location' => $this->location,
                 'notes' => $this->notes,
             ]);
-            $this->dispatch('notify', ['message' => 'Time log updated successfully.']);
+            $this->showNotification('Time log updated successfully.');
         } else {
             TimeLog::create([
                 'user_id' => auth()->id(),
@@ -76,7 +78,7 @@ class TimeLogs extends Component
                 'location' => $this->location,
                 'notes' => $this->notes,
             ]);
-            $this->dispatch('notify', ['message' => 'Time log created successfully.']);
+            $this->showNotification('Time log created successfully.');
         }
 
         $this->reset(['date', 'service_id', 'hours', 'location', 'notes', 'editingId', 'showModal']);
@@ -98,7 +100,7 @@ class TimeLogs extends Component
     {
         $timeLog = TimeLog::findOrFail($id);
         $timeLog->delete();
-        $this->dispatch('notify', ['message' => 'Time log deleted successfully.']);
+        $this->showNotification('Time log deleted successfully.');
     }
 
     public function duplicate($id)
@@ -107,7 +109,7 @@ class TimeLogs extends Component
         $newTimeLog = $timeLog->replicate();
         $newTimeLog->date = now()->format('Y-m-d');
         $newTimeLog->save();
-        $this->dispatch('notify', ['message' => 'Time log duplicated successfully.']);
+        $this->showNotification('Time log duplicated successfully.');
     }
 
     public function toggleSort()
@@ -123,5 +125,11 @@ class TimeLogs extends Component
 
         $service = Service::find($this->service_id);
         return $service ? $service->price_per_hour * $this->hours : 0;
+    }
+
+    private function showNotification($message)
+    {
+        $this->notificationMessage = $message;
+        $this->showNotification = true;
     }
 }
