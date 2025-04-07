@@ -4,12 +4,14 @@ namespace App\Livewire;
 
 use App\Models\Service;
 use App\Models\TimeLog;
+use App\Traits\WithNotifications;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class TimeLogs extends Component
 {
     use WithPagination;
+    use WithNotifications;
 
     public $date;
     public $service_id;
@@ -19,8 +21,6 @@ class TimeLogs extends Component
     public $sort = 'desc';
     public $editingId = null;
     public $showModal = false;
-    public $showNotification = false;
-    public $notificationMessage = '';
 
     protected $rules = [
         'date' => 'required|date',
@@ -125,11 +125,5 @@ class TimeLogs extends Component
 
         $service = Service::find($this->service_id);
         return $service ? $service->price_per_hour * $this->hours : 0;
-    }
-
-    private function showNotification($message)
-    {
-        $this->notificationMessage = $message;
-        $this->showNotification = true;
     }
 }
