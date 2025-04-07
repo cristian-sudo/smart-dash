@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
-use App\Http\Controllers\TimeLogController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
@@ -15,13 +14,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::prefix('dashboard')->group(function () {
-        // Time Logs Routes
-        Route::get('/time-logs', [TimeLogController::class, 'index'])->name('time-logs.index');
-        Route::post('/time-logs', [TimeLogController::class, 'store'])->name('time-logs.store');
-        Route::get('/time-logs/calendar', [TimeLogController::class, 'calendar'])->name('time-logs.calendar');
-        Route::post('/time-logs/generate-invoice', [TimeLogController::class, 'generateInvoice'])->name('time-logs.generate-invoice');
-        Route::get('/time-logs/preview-invoice', [TimeLogController::class, 'previewInvoice'])->name('time-logs.preview-invoice');
-        Route::delete('/time-logs/{timeLog}', [TimeLogController::class, 'destroy'])->name('time-logs.destroy');
+        // Time Logs Route
+        Route::get('/time-logs', function () {
+            return view('dashboard.time-logs');
+        })->name('time-logs.index');
 
         // Invoices Routes
         Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
@@ -54,12 +50,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/dashboard/services', [ServiceController::class, 'store'])->name('services.store');
     Route::put('/dashboard/services/{service}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('/dashboard/services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
-    Route::get('/dashboard/time-logs', [TimeLogController::class, 'index'])->name('time-logs.index');
-    Route::get('/dashboard/time-logs/{timeLog}', [TimeLogController::class, 'show'])->name('time-logs.show');
-    Route::post('/dashboard/time-logs', [TimeLogController::class, 'store'])->name('time-logs.store');
-    Route::put('/dashboard/time-logs/{timeLog}', [TimeLogController::class, 'update'])->name('time-logs.update');
-    Route::delete('/dashboard/time-logs/{timeLog}', [TimeLogController::class, 'destroy'])->name('time-logs.destroy');
-    Route::get('/dashboard/time-logs/{timeLog}/duplicate', [TimeLogController::class, 'duplicate'])->name('time-logs.duplicate');
 });
 
 require __DIR__.'/auth.php';
