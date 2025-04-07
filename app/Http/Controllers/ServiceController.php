@@ -18,7 +18,7 @@ class ServiceController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'default_price' => 'required|numeric|min:0',
+            'price_per_hour' => 'required|numeric|min:0',
         ]);
 
         Service::create($validated);
@@ -31,7 +31,7 @@ class ServiceController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'default_price' => 'required|numeric|min:0',
+            'price_per_hour' => 'required|numeric|min:0',
         ]);
 
         $service->update($validated);

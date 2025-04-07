@@ -12,11 +12,16 @@ class Service extends Model
     protected $fillable = [
         'name',
         'description',
-        'default_price',
+        'price_per_hour',
     ];
 
     public function timeLogs()
     {
         return $this->hasMany(TimeLog::class);
+    }
+
+    public function calculatePriceForHours($hours)
+    {
+        return $this->price_per_hour * $hours;
     }
 } 

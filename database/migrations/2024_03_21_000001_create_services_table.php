@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->decimal('default_price', 10, 2);
+            $table->decimal('price_per_hour', 10, 2)->comment('Price per hour for this service');
             $table->timestamps();
         });
     }

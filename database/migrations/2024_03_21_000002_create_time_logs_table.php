@@ -14,8 +14,7 @@ return new class extends Migration
             $table->foreignId('service_id')->constrained()->onDelete('cascade');
             $table->date('date');
             $table->decimal('hours', 5, 2);
-            $table->string('location');
-            $table->decimal('price', 10, 2);
+            $table->string('location')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

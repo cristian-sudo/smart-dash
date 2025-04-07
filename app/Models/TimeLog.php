@@ -34,4 +34,9 @@ class TimeLog extends Model
     {
         return $this->belongsTo(Service::class);
     }
+
+    public function getTotalPriceAttribute()
+    {
+        return $this->service->calculatePriceForHours($this->hours);
+    }
 } 
