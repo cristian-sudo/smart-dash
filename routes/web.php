@@ -54,29 +54,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->take(5)
             ->get();
 
-        // Additional stats
-        $totalServices = Service::where('user_id', Auth::id())->count();
-        $totalInvoices = Invoice::where('user_id', Auth::id())->count();
-        $totalEarnings = TimeLog::where('user_id', Auth::id())
-            ->selectRaw('SUM(hours * rate) as total')
-            ->value('total') ?? 0;
-
-        // Chart data - last 6 months
-        $chartData = collect(range(5, 0))->map(function ($monthsAgo) {
-            $date = Carbon::now()->subMonths($monthsAgo);
-            $monthLogs = TimeLog::where('user_id', Auth::id())
-                ->whereMonth('date', $date->month)
-                ->whereYear('date', $date->year)
+        // Get daily data for the current month
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
+        
+        $dailyData = collect();
+        for ($date = $startOfMonth; $date <= $endOfMonth; $date->addDay()) {
+            $dayLogs = TimeLog::where('user_id', Auth::id())
+                ->whereDate('date', $date)
                 ->get();
             
-            return [
-                'month' => $date->format('M Y'),
-                'hours' => $monthLogs->sum('hours'),
-                'earnings' => $monthLogs->sum(function ($log) {
+            $dailyData->push([
+                'date' => $date->format('Y-m-d'),
+                'day' => $date->format('j'),
+                'hours' => $dayLogs->sum('hours'),
+                'earnings' => $dayLogs->sum(function ($log) {
                     return $log->hours * $log->rate;
                 })
-            ];
-        });
+            ]);
+        }
 
         return view('dashboard', [
             'totalHoursThisMonth' => $totalHoursThisMonth,
@@ -84,10 +80,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'averageHoursPerDay' => $averageHoursPerDay,
             'mostUsedService' => $mostUsedService,
             'recentTimeLogs' => $recentTimeLogs,
-            'totalServices' => $totalServices,
-            'totalInvoices' => $totalInvoices,
-            'totalEarnings' => $totalEarnings,
-            'chartData' => $chartData
+            'dailyData' => $dailyData,
+            'currentMonth' => Carbon::now()->format('F Y'),
+            'startOfMonth' => $startOfMonth,
+            'endOfMonth' => $endOfMonth
         ]);
     })->name('dashboard');
 
