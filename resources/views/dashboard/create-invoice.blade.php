@@ -10,15 +10,33 @@
                         </a>
                     </div>
 
-                    <form action="{{ route('invoices.preview') }}" method="GET" class="space-y-6">
-                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                            <div>
-                                <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
-                                <input type="date" name="start_date" id="start_date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600" required>
-                            </div>
-                            <div>
-                                <label for="end_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
-                                <input type="date" name="end_date" id="end_date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600" required>
+                    <form action="{{ route('invoices.preview') }}" method="POST" class="space-y-6">
+                        @csrf
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Invoice Name</label>
+                            <input type="text" name="name" id="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select Time Logs</label>
+                            <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
+                                <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                                    @foreach($timeLogs as $log)
+                                    <li class="px-4 py-4">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" name="time_logs[]" value="{{ $log->id }}" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                            <div class="ml-3">
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    {{ $log->date->format('M d, Y') }} - {{ $log->service->name }}
+                                                </p>
+                                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                                    {{ $log->hours }} hours at {{ $log->location }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    @endforeach
+                                </ul>
                             </div>
                         </div>
 

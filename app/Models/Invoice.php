@@ -14,8 +14,7 @@ class Invoice extends Model
     protected $fillable = [
         'user_id',
         'invoice_number',
-        'start_date',
-        'end_date',
+        'name',
         'total_hours',
         'total_amount',
         'notes',
@@ -23,8 +22,6 @@ class Invoice extends Model
     ];
 
     protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
         'total_hours' => 'decimal:2',
         'total_amount' => 'decimal:2',
     ];
@@ -36,7 +33,7 @@ class Invoice extends Model
 
     public function timeLogs(): BelongsToMany
     {
-        return $this->belongsToMany(TimeLog::class)
+        return $this->belongsToMany(TimeLog::class, 'invoice_time_logs')
             ->withTimestamps();
     }
 

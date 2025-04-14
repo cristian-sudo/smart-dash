@@ -1,13 +1,12 @@
-@props(['show', 'message'])
+@props(['show' => false, 'message' => ''])
 
 <div x-data="{ 
-    show: @entangle('showNotification'),
+    show: @entangle('show'),
     init() {
         this.$watch('show', (value) => {
             if (value) {
                 setTimeout(() => {
                     this.show = false;
-                    @this.hideNotification();
                 }, 3000);
             }
         });

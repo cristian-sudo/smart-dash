@@ -4,14 +4,95 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\TimeLogController;
+use App\Livewire\Invoices;
+use App\Models\TimeLog;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use App\Models\Service;
+use App\Models\Invoice;
+use App\Livewire\Services;
 
+// Public routes
 Route::get('/', function () {
     return view('home');
 })->name('home');
 
+// Authenticated routes
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', function () {
+        $timeLogsThisMonth = TimeLog::where('user_id', Auth::id())
+            ->whereMonth('date', Carbon::now()->month)
+            ->whereYear('date', Carbon::now()->year)
+            ->get();
+
+        $totalHoursThisMonth = $timeLogsThisMonth->sum('hours');
+        $totalEarningsThisMonth = $timeLogsThisMonth->sum(function ($timeLog) {
+            return $timeLog->hours * $timeLog->rate;
+        });
+
+        // Calculate average hours per day
+        $daysInMonth = Carbon::now()->daysInMonth;
+        $averageHoursPerDay = $daysInMonth > 0 ? $totalHoursThisMonth / $daysInMonth : 0;
+
+        // Calculate most used service
+        $mostUsedService = $timeLogsThisMonth
+            ->groupBy('service_id')
+            ->map(function ($logs) {
+                return [
+                    'service' => $logs->first()->service,
+                    'hours' => $logs->sum('hours')
+                ];
+            })
+            ->sortByDesc('hours')
+            ->first();
+
+        // Get recent time logs
+        $recentTimeLogs = TimeLog::where('user_id', Auth::id())
+            ->with('service')
+            ->orderBy('date', 'desc')
+            ->take(5)
+            ->get();
+
+        // Additional stats
+        $totalServices = Service::where('user_id', Auth::id())->count();
+        $totalInvoices = Invoice::where('user_id', Auth::id())->count();
+        $totalEarnings = TimeLog::where('user_id', Auth::id())
+            ->selectRaw('SUM(hours * rate) as total')
+            ->value('total') ?? 0;
+
+        // Chart data - last 6 months
+        $chartData = collect(range(5, 0))->map(function ($monthsAgo) {
+            $date = Carbon::now()->subMonths($monthsAgo);
+            $monthLogs = TimeLog::where('user_id', Auth::id())
+                ->whereMonth('date', $date->month)
+                ->whereYear('date', $date->year)
+                ->get();
+            
+            return [
+                'month' => $date->format('M Y'),
+                'hours' => $monthLogs->sum('hours'),
+                'earnings' => $monthLogs->sum(function ($log) {
+                    return $log->hours * $log->rate;
+                })
+            ];
+        });
+
+        return view('dashboard', [
+            'totalHoursThisMonth' => $totalHoursThisMonth,
+            'totalEarningsThisMonth' => $totalEarningsThisMonth,
+            'averageHoursPerDay' => $averageHoursPerDay,
+            'mostUsedService' => $mostUsedService,
+            'recentTimeLogs' => $recentTimeLogs,
+            'totalServices' => $totalServices,
+            'totalInvoices' => $totalInvoices,
+            'totalEarnings' => $totalEarnings,
+            'chartData' => $chartData
+        ]);
+    })->name('dashboard');
+
+    Route::get('/time-logs', [TimeLogController::class, 'index'])->name('time-logs.index');
+    Route::get('/services', Services::class)->name('services.index');
 
     Route::prefix('dashboard')->group(function () {
         // Time Logs Route
@@ -19,13 +100,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return view('dashboard.time-logs');
         })->name('time-logs.index');
 
-        // Invoices Routes
-        Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
-        Route::get('/invoices/preview', [InvoiceController::class, 'preview'])->name('invoices.preview');
-        Route::get('/invoices/download', [InvoiceController::class, 'download'])->name('invoices.download');
+        // Invoices Route
+        Route::get('/invoices', Invoices::class)->name('invoices.index');
+        Route::get('/invoices/{invoice}/download', [Invoices::class, 'download'])->name('invoices.download');
 
         // Services Routes
-        Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
         Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
         Route::put('/services/{service}', [ServiceController::class, 'update'])->name('services.update');
         Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
@@ -36,20 +115,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
-});
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard/invoice', [InvoiceController::class, 'preview'])->name('invoice.preview');
-    Route::get('/dashboard/invoice/download', [InvoiceController::class, 'download'])->name('invoice.download');
-    Route::get('/dashboard/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
-    Route::get('/dashboard/invoices/create', [InvoiceController::class, 'create'])->name('invoices.create');
-    Route::put('/dashboard/invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
-    Route::delete('/dashboard/invoices/{invoice}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
-    Route::get('/dashboard/services', [ServiceController::class, 'index'])->name('services.index');
-    Route::post('/dashboard/services', [ServiceController::class, 'store'])->name('services.store');
-    Route::put('/dashboard/services/{service}', [ServiceController::class, 'update'])->name('services.update');
-    Route::delete('/dashboard/services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
 });
 
 require __DIR__.'/auth.php';

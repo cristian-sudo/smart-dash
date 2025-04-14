@@ -6,22 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('name');
             $table->string('invoice_number')->unique();
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->decimal('total_hours', 8, 2);
+            $table->decimal('total_hours', 5, 2);
             $table->decimal('total_amount', 10, 2);
-            $table->text('notes')->nullable();
-            $table->enum('status', ['draft', 'sent', 'paid', 'cancelled'])->default('draft');
             $table->timestamps();
         });
 
-        Schema::create('invoice_time_log', function (Blueprint $table) {
+        Schema::create('invoice_time_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('invoice_id')->constrained()->onDelete('cascade');
             $table->foreignId('time_log_id')->constrained()->onDelete('cascade');
@@ -29,9 +26,9 @@ return new class extends Migration
         });
     }
 
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('invoice_time_log');
+        Schema::dropIfExists('invoice_time_logs');
         Schema::dropIfExists('invoices');
     }
 }; 
