@@ -2,13 +2,13 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Notification -->
-            <x-notification :message="$notificationMessage" />
+            <x-notification :message="$notificationMessage" :show="$show" />
 
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">Time Logs</h2>
-                        <button wire:click="$set('showModal', true)"
+                        <button x-on:click="$dispatch('open-modal')"
                                 class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:bg-indigo-700 dark:focus:bg-indigo-600 active:bg-indigo-900 dark:active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                             {{ __('New Time Log') }}
                         </button>
@@ -16,66 +16,116 @@
 
                     <!-- Time Logs Table -->
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        <button wire:click="toggleSort" class="flex items-center">
-                                            Date
-                                            @if($sort === 'desc')
-                                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            @else
-                                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                                                </svg>
-                                            @endif
-                                        </button>
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Service</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Hours</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Rate/Hour</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Notes</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                @forelse($timeLogs as $timeLog)
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $timeLog->date->format('Y-m-d') }}</td>
-                                    <td class="px-6 py-4">{{ $timeLog->service->name }}</td>
-                                    <td class="px-6 py-4 text-right">{{ number_format($timeLog->hours, 2) }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">${{ number_format($timeLog->rate, 2) }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">${{ number_format($timeLog->hours * $timeLog->rate, 2) }}</td>
-                                    <td class="px-6 py-4">{{ $timeLog->location }}</td>
-                                    <td class="px-6 py-4">{{ $timeLog->notes }}</td>
-                                    <td class="px-6 py-4 text-right space-x-2">
-                                        <div class="flex items-center space-x-2">
-                                            <button wire:click="edit({{ $timeLog->id }})" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300" data-tooltip="Edit Time Log">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                </svg>
+                        <!-- Mobile View -->
+                        <div class="sm:hidden space-y-4">
+                            @forelse($timeLogs as $timeLog)
+                                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ $timeLog->date->format('Y-m-d') }}
+                                        </div>
+                                        <div class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                                            ${{ number_format($timeLog->hours * $timeLog->rate, 2) }}
+                                        </div>
+                                    </div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                                        {{ $timeLog->service->name }}
+                                    </div>
+                                    <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-2">
+                                        <span>{{ number_format($timeLog->hours, 1) }} hours</span>
+                                        <span>{{ $timeLog->location ?? 'N/A' }}</span>
+                                    </div>
+                                    @if($timeLog->notes)
+                                        <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                                            {{ $timeLog->notes }}
+                                        </div>
+                                    @endif
+                                    <div class="flex justify-end space-x-2">
+                                        <div class="flex space-x-2 relative z-[50]">
+                                            <button wire:click="edit({{ $timeLog->id }})"
+                                                    class="p-1 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
+                                                    data-tooltip="Edit">
+                                                <x-icons.edit />
                                             </button>
-                                            <button wire:click="delete({{ $timeLog->id }})" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300" data-tooltip="Delete Time Log" onclick="return confirm('Are you sure you want to delete this time log?')">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
+                                            <button wire:click="duplicate({{ $timeLog->id }})"
+                                                    class="p-1 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
+                                                    data-tooltip="Duplicate">
+                                                <x-icons.duplicate />
+                                            </button>
+                                            <button wire:click="delete({{ $timeLog->id }})"
+                                                    class="p-1 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
+                                                    data-tooltip="Delete"
+                                                    onclick="return confirm('Are you sure you want to delete this time log?')">
+                                                <x-icons.trash />
                                             </button>
                                         </div>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                                        No time logs found. Click "New Time Log" to create one.
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center text-gray-500 dark:text-gray-400 py-4">
+                                    No time logs found. Click "New Time Log" to create one.
+                                </div>
+                            @endforelse
+                        </div>
+
+                        <!-- Desktop View -->
+                        <div class="hidden sm:block">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-800">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Service</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hours</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rate</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Location</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Notes</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                    @forelse($timeLogs as $timeLog)
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $timeLog->date->format('Y-m-d') }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{{ $timeLog->service->name }}</td>
+                                        <td class="px-6 py-4 text-sm text-right text-gray-900 dark:text-gray-100">{{ number_format($timeLog->hours, 2) }}</td>
+                                        <td class="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-gray-100">${{ number_format($timeLog->rate, 2) }}</td>
+                                        <td class="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-gray-100">${{ number_format($timeLog->hours * $timeLog->rate, 2) }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{{ $timeLog->location }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{{ $timeLog->notes }}</td>
+                                        <td class="px-6 py-4 text-sm text-right space-x-2">
+                                            <div class="flex items-center justify-end space-x-2">
+                                                <div class="flex space-x-2 relative z-[50]">
+                                                    <button wire:click="edit({{ $timeLog->id }})"
+                                                            class="p-1 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
+                                                            data-tooltip="Edit">
+                                                        <x-icons.edit />
+                                                    </button>
+                                                    <button wire:click="duplicate({{ $timeLog->id }})"
+                                                            class="p-1 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
+                                                            data-tooltip="Duplicate">
+                                                        <x-icons.duplicate />
+                                                    </button>
+                                                    <button wire:click="delete({{ $timeLog->id }})"
+                                                            class="p-1 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
+                                                            data-tooltip="Delete"
+                                                            onclick="return confirm('Are you sure you want to delete this time log?')">
+                                                        <x-icons.trash />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                            No time logs found. Click "New Time Log" to create one.
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <div class="mt-4">
@@ -83,25 +133,24 @@
                     </div>
 
                     <!-- New Time Log Modal -->
-                    <div x-data="{ show: @entangle('showModal') }"
+                    <div x-data="{ show: false }"
+                         x-cloak
                          x-show="show"
-                         x-on:click.away="$wire.showModal = false"
-                         x-on:keydown.escape.window="$wire.showModal = false"
-                         class="fixed inset-0 z-50"
+                         x-on:open-modal.window="show = true"
+                         x-on:keydown.escape.window="show = false"
+                         x-on:close-modal.window="show = false"
+                         class="fixed inset-0 z-[100]"
                          style="display: none;">
+                        
                         <!-- Backdrop -->
                         <div x-show="show"
-                             x-transition:enter="ease-out duration-300"
-                             x-transition:enter-start="opacity-0"
-                             x-transition:enter-end="opacity-100"
-                             x-transition:leave="ease-in duration-200"
-                             x-transition:leave-start="opacity-100"
-                             x-transition:leave-end="opacity-0"
+                             x-transition.opacity.duration.300ms
                              class="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-75"
-                             @click="$wire.showModal = false">
+                             @click="show = false">
                         </div>
 
-                        <div class="fixed inset-0 overflow-y-auto">
+                        <!-- Modal Panel -->
+                        <div class="fixed inset-0 z-[101] pointer-events-none">
                             <div class="flex items-center justify-center min-h-screen p-4">
                                 <div x-show="show"
                                      x-transition:enter="ease-out duration-300"
@@ -110,7 +159,9 @@
                                      x-transition:leave="ease-in duration-200"
                                      x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                                      x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                                     class="relative bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-2xl sm:w-full">
+                                     class="relative bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-2xl w-full max-h-[90vh] overflow-y-auto pointer-events-auto"
+                                     @click.away="show = false">
+                                    
                                     <div class="bg-white dark:bg-gray-800 px-6 py-6">
                                         <div class="mt-3">
                                             <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
@@ -178,9 +229,9 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="mt-6 flex justify-end space-x-4">
+                                                <div class="mt-6 flex justify-end space-x-4 sticky bottom-0 bg-white dark:bg-gray-800 py-4">
                                                     <button type="button" 
-                                                            @click="$wire.showModal = false"
+                                                            @click="show = false"
                                                             class="inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-3 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                                                         Cancel
                                                     </button>

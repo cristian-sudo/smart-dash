@@ -4,18 +4,18 @@ namespace App\Traits;
 
 trait WithNotifications
 {
-    public $showNotification = false;
+    public $show = false;
     public $notificationMessage = '';
 
     public function showNotification(string $message)
     {
         $this->notificationMessage = $message;
-        $this->showNotification = true;
+        $this->show = true;
     }
 
     public function hideNotification()
     {
-        $this->showNotification = false;
+        $this->show = false;
         $this->notificationMessage = '';
     }
 } 

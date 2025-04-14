@@ -32,7 +32,6 @@ class TimeLogs extends Component
     public $notes = '';
 
     public $sort = 'desc';
-    public $showModal = false;
     public $isEditing = false;
     public $timeLogId = null;
     public $selectedLocation = '';
@@ -79,7 +78,6 @@ class TimeLogs extends Component
         $this->reset(['date', 'service_id', 'hours', 'location', 'notes', 'timeLogId', 'isEditing']);
         $this->date = now()->format('Y-m-d');
         $this->hours = 8;
-        $this->showModal = true;
     }
 
     public function edit(TimeLog $timeLog)
@@ -91,7 +89,7 @@ class TimeLogs extends Component
         $this->location = $timeLog->location;
         $this->notes = $timeLog->notes;
         $this->isEditing = true;
-        $this->showModal = true;
+        $this->dispatch('open-modal');
     }
 
     public function save()
@@ -132,8 +130,8 @@ class TimeLogs extends Component
         $this->reset(['date', 'service_id', 'hours', 'location', 'notes', 'timeLogId', 'isEditing', 'selectedLocation']);
         $this->date = now()->format('Y-m-d');
         $this->hours = 8;
-        $this->showModal = false;
-        $this->dispatch('notify', ['message' => 'Time log saved successfully!']);
+        $this->showNotification('Time log saved successfully!');
+        $this->dispatch('close-modal');
     }
 
     public function delete(TimeLog $timeLog)
