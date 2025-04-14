@@ -20,72 +20,7 @@ Route::get('/', function () {
 
 // Authenticated routes
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        $timeLogsThisMonth = TimeLog::where('user_id', Auth::id())
-            ->whereMonth('date', Carbon::now()->month)
-            ->whereYear('date', Carbon::now()->year)
-            ->get();
-
-        $totalHoursThisMonth = $timeLogsThisMonth->sum('hours');
-        $totalEarningsThisMonth = $timeLogsThisMonth->sum(function ($timeLog) {
-            return $timeLog->hours * $timeLog->rate;
-        });
-
-        // Calculate average hours per day
-        $daysInMonth = Carbon::now()->daysInMonth;
-        $averageHoursPerDay = $daysInMonth > 0 ? $totalHoursThisMonth / $daysInMonth : 0;
-
-        // Calculate most used service
-        $mostUsedService = $timeLogsThisMonth
-            ->groupBy('service_id')
-            ->map(function ($logs) {
-                return [
-                    'service' => $logs->first()->service,
-                    'hours' => $logs->sum('hours')
-                ];
-            })
-            ->sortByDesc('hours')
-            ->first();
-
-        // Get recent time logs
-        $recentTimeLogs = TimeLog::where('user_id', Auth::id())
-            ->with('service')
-            ->orderBy('date', 'desc')
-            ->take(5)
-            ->get();
-
-        // Get daily data for the current month
-        $startOfMonth = Carbon::now()->startOfMonth();
-        $endOfMonth = Carbon::now()->endOfMonth();
-        
-        $dailyData = collect();
-        for ($date = $startOfMonth; $date <= $endOfMonth; $date->addDay()) {
-            $dayLogs = TimeLog::where('user_id', Auth::id())
-                ->whereDate('date', $date)
-                ->get();
-            
-            $dailyData->push([
-                'date' => $date->format('Y-m-d'),
-                'day' => $date->format('j'),
-                'hours' => $dayLogs->sum('hours'),
-                'earnings' => $dayLogs->sum(function ($log) {
-                    return $log->hours * $log->rate;
-                })
-            ]);
-        }
-
-        return view('dashboard', [
-            'totalHoursThisMonth' => $totalHoursThisMonth,
-            'totalEarningsThisMonth' => $totalEarningsThisMonth,
-            'averageHoursPerDay' => $averageHoursPerDay,
-            'mostUsedService' => $mostUsedService,
-            'recentTimeLogs' => $recentTimeLogs,
-            'dailyData' => $dailyData,
-            'currentMonth' => Carbon::now()->format('F Y'),
-            'startOfMonth' => $startOfMonth,
-            'endOfMonth' => $endOfMonth
-        ]);
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/time-logs', [TimeLogController::class, 'index'])->name('time-logs.index');
     Route::get('/services', Services::class)->name('services.index');
@@ -109,6 +44,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/clients', function () {
             return view('dashboard.clients');
         })->name('clients.index');
+
+        // Companies Route
+        Route::get('/companies', function () {
+            return view('dashboard.companies');
+        })->name('companies.index');
     });
 
     Route::redirect('settings', 'settings/profile');

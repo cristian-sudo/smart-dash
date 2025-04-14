@@ -102,6 +102,7 @@ class DashboardController extends Controller
             'averageHoursPerDay' => $averageHoursPerDay,
             'mostUsedService' => $mostUsedService,
             'recentTimeLogs' => $recentTimeLogs,
+            'dailyData' => $dailyData,
             'currentMonth' => Carbon::now()->format('F Y'),
             'startOfMonth' => $startOfMonth,
             'endOfMonth' => $endOfMonth,

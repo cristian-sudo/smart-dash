@@ -152,6 +152,9 @@
         <!-- Header -->
         <div class="header">
             <div class="header-left">
+                @if(auth()->user()->logo && file_exists(auth()->user()->logo_path))
+                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(auth()->user()->logo_path)) }}" alt="Company Logo" style="max-height: 300px; min-height: 250px; margin-bottom: 2rem; object-fit: contain;">
+                @endif
                 <h1>Invoice</h1>
                 <p class="text-gray">{{ config('app.name') }}</p>
             </div>

@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'logo',
     ];
 
     /**
@@ -56,5 +57,34 @@ class User extends Authenticatable
             ->explode(' ')
             ->map(fn (string $name) => Str::of($name)->substr(0, 1))
             ->implode('');
+    }
+
+    public function getLogoUrlAttribute()
+    {
+        if (!$this->logo) {
+            return null;
+        }
+        
+        $url = asset('storage/' . $this->logo);
+        return str_replace('http://', 'https://', $url);
+    }
+
+    public function getLogoPathAttribute()
+    {
+        if (!$this->logo) {
+            return null;
+        }
+        
+        return storage_path('app/public/' . $this->logo);
+    }
+
+    public function companies()
+    {
+        return $this->hasMany(Company::class);
+    }
+
+    public function defaultCompany()
+    {
+        return $this->hasOne(Company::class)->where('is_default', true);
     }
 }

@@ -102,6 +102,9 @@
                                                             <!-- Header -->
                                                             <div class="flex justify-between items-start mb-8">
                                                                 <div>
+                                                                    @if(auth()->user()->logo)
+                                                                        <img src="{{ auth()->user()->logo_url }}" alt="Company Logo" class="h-20 w-auto mb-4">
+                                                                    @endif
                                                                     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Invoice</h1>
                                                                     <p class="text-sm text-gray-600 dark:text-gray-400">{{ config('app.name') }}</p>
                                                                 </div>
@@ -284,6 +287,9 @@
                                                     <!-- Header -->
                                                     <div class="flex justify-between items-start mb-8">
                                                         <div>
+                                                            @if(auth()->user()->logo)
+                                                                <img src="{{ auth()->user()->logo_url }}" alt="Company Logo" class="h-20 w-auto mb-4">
+                                                            @endif
                                                             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Invoice</h1>
                                                             <p class="text-sm text-gray-600 dark:text-gray-400">{{ config('app.name') }}</p>
                                                         </div>
