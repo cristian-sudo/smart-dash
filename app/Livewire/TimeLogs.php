@@ -9,6 +9,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Rule;
+use App\Models\Location;
 
 class TimeLogs extends Component
 {
@@ -34,11 +35,26 @@ class TimeLogs extends Component
     public $showModal = false;
     public $isEditing = false;
     public $timeLogId = null;
+    public $selectedLocation = '';
+    public $savedLocations = [];
 
     public function mount()
     {
         $this->date = now()->format('Y-m-d');
-        $this->hours = 0.25;
+        $this->hours = 8;
+        $this->loadSavedLocations();
+    }
+
+    public function loadSavedLocations()
+    {
+        $this->savedLocations = Location::where('user_id', auth()->id())->get();
+    }
+
+    public function updatedSelectedLocation($value)
+    {
+        if ($value) {
+            $this->location = $value;
+        }
     }
 
     public function render()
@@ -62,7 +78,7 @@ class TimeLogs extends Component
     {
         $this->reset(['date', 'service_id', 'hours', 'location', 'notes', 'timeLogId', 'isEditing']);
         $this->date = now()->format('Y-m-d');
-        $this->hours = 0.25;
+        $this->hours = 8;
         $this->showModal = true;
     }
 
@@ -82,47 +98,42 @@ class TimeLogs extends Component
     {
         $this->validate();
 
-        \Log::info('Saving time log with data:', [
-            'user_id' => Auth::id(),
-            'date' => $this->date,
-            'service_id' => $this->service_id,
-            'hours' => $this->hours,
-            'location' => $this->location,
-            'notes' => $this->notes,
-        ]);
-
-        try {
-            if ($this->isEditing) {
-                $timeLog = TimeLog::find($this->timeLogId);
-                $timeLog->update([
-                    'date' => $this->date,
-                    'service_id' => $this->service_id,
-                    'hours' => (float) $this->hours,
-                    'rate' => Service::find($this->service_id)->rate,
-                    'location' => $this->location,
-                    'notes' => $this->notes,
-                ]);
-                $this->showNotification('Time log updated successfully.');
-            } else {
-                $timeLog = TimeLog::create([
-                    'user_id' => Auth::id(),
-                    'date' => $this->date,
-                    'service_id' => $this->service_id,
-                    'hours' => (float) $this->hours,
-                    'rate' => Service::find($this->service_id)->rate,
-                    'location' => $this->location,
-                    'notes' => $this->notes,
-                ]);
-                $this->showNotification('Time log created successfully.');
-            }
-        } catch (\Exception $e) {
-            \Log::error('Error saving time log: ' . $e->getMessage());
-            $this->showNotification('Error saving time log: ' . $e->getMessage(), 'error');
+        // Get the service rate
+        $service = Service::find($this->service_id);
+        if (!$service) {
+            $this->addError('service_id', 'Selected service not found');
             return;
         }
 
-        $this->reset(['showModal', 'date', 'service_id', 'hours', 'location', 'notes', 'timeLogId', 'isEditing']);
+        // Save the time log
+        $timeLog = TimeLog::updateOrCreate(
+            ['id' => $this->timeLogId],
+            [
+                'user_id' => auth()->id(),
+                'date' => $this->date,
+                'service_id' => $this->service_id,
+                'hours' => $this->hours,
+                'rate' => $service->rate,
+                'location' => $this->location,
+                'notes' => $this->notes,
+            ]
+        );
+
+        // Save the location if it's new
+        if ($this->location && !$this->savedLocations->contains('name', $this->location)) {
+            Location::create([
+                'user_id' => auth()->id(),
+                'name' => $this->location,
+            ]);
+            $this->loadSavedLocations();
+        }
+
+        // Reset only the necessary properties
+        $this->reset(['date', 'service_id', 'hours', 'location', 'notes', 'timeLogId', 'isEditing', 'selectedLocation']);
         $this->date = now()->format('Y-m-d');
+        $this->hours = 8;
+        $this->showModal = false;
+        $this->dispatch('notify', ['message' => 'Time log saved successfully!']);
     }
 
     public function delete(TimeLog $timeLog)

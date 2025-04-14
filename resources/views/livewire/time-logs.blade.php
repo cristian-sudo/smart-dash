@@ -8,7 +8,8 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">Time Logs</h2>
-                        <button wire:click="create" class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:bg-indigo-700 dark:focus:bg-indigo-600 active:bg-indigo-900 dark:active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                        <button wire:click="$set('showModal', true)"
+                                class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:bg-indigo-700 dark:focus:bg-indigo-600 active:bg-indigo-900 dark:active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                             {{ __('New Time Log') }}
                         </button>
                     </div>
@@ -82,102 +83,115 @@
                     </div>
 
                     <!-- New Time Log Modal -->
-                    <div x-data="{ show: @entangle('showModal') }" 
+                    <div x-data="{ show: @entangle('showModal') }"
                          x-show="show"
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0"
-                         x-transition:enter-end="opacity-100"
-                         x-transition:leave="transition ease-in duration-200"
-                         x-transition:leave-start="opacity-100"
-                         x-transition:leave-end="opacity-0"
-                         class="fixed inset-0 z-50 overflow-y-auto"
+                         x-on:click.away="$wire.showModal = false"
+                         x-on:keydown.escape.window="$wire.showModal = false"
+                         class="fixed inset-0 z-50"
                          style="display: none;">
-                        <!-- Background overlay -->
-                        <div class="fixed inset-0 bg-black/50"></div>
+                        <!-- Backdrop -->
+                        <div x-show="show"
+                             x-transition:enter="ease-out duration-300"
+                             x-transition:enter-start="opacity-0"
+                             x-transition:enter-end="opacity-100"
+                             x-transition:leave="ease-in duration-200"
+                             x-transition:leave-start="opacity-100"
+                             x-transition:leave-end="opacity-0"
+                             class="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-75"
+                             @click="$wire.showModal = false">
+                        </div>
 
-                        <!-- Modal panel -->
-                        <div class="flex min-h-full items-center justify-center p-4">
-                            <div x-transition:enter="transition ease-out duration-300"
-                                 x-transition:enter-start="opacity-0 scale-95"
-                                 x-transition:enter-end="opacity-100 scale-100"
-                                 x-transition:leave="transition ease-in duration-200"
-                                 x-transition:leave-start="opacity-100 scale-100"
-                                 x-transition:leave-end="opacity-0 scale-95"
-                                 class="relative w-full max-w-md transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 p-6 shadow-xl">
-                                <!-- Close button -->
-                                <button @click="$wire.showModal = false" 
-                                        class="absolute top-4 right-4 text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400">
-                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
+                        <div class="fixed inset-0 overflow-y-auto">
+                            <div class="flex items-center justify-center min-h-screen p-4">
+                                <div x-show="show"
+                                     x-transition:enter="ease-out duration-300"
+                                     x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                                     x-transition:leave="ease-in duration-200"
+                                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                     class="relative bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-2xl sm:w-full">
+                                    <div class="bg-white dark:bg-gray-800 px-6 py-6">
+                                        <div class="mt-3">
+                                            <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
+                                                {{ $timeLogId ? 'Edit Time Log' : 'Add Time Log' }}
+                                            </h3>
+                                            <form wire:submit.prevent="save" class="mt-4 space-y-4">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label for="date" class="block text-base font-medium text-gray-700 dark:text-gray-300">Date</label>
+                                                        <input type="date" wire:model.live="date" id="date" required
+                                                               class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                        @error('date') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                    </div>
 
-                                <div class="mt-3">
-                                    <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
-                                        {{ $timeLogId ? 'Edit Time Log' : 'Add Time Log' }}
-                                    </h3>
-                                    <form wire:submit.prevent="save" class="mt-4 space-y-4">
-                                        <div>
-                                            <label for="date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
-                                            <input type="date" wire:model.live="date" id="date" required
-                                                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 sm:text-sm">
-                                            @error('date') <span class="mt-1 text-sm text-red-600">{{ $message }}</span> @enderror
-                                        </div>
+                                                    <div>
+                                                        <label for="service_id" class="block text-base font-medium text-gray-700 dark:text-gray-300">Service</label>
+                                                        <select wire:model.live="service_id" id="service_id" required
+                                                                class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            <option value="">Select a service</option>
+                                                            @foreach($services as $service)
+                                                                <option value="{{ $service->id }}">{{ $service->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        @error('service_id') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                    </div>
 
-                                        <div>
-                                            <label for="service_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Service</label>
-                                            <select wire:model.live="service_id" id="service_id" required
-                                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 sm:text-sm">
-                                                <option value="">Select a service</option>
-                                                @foreach($services as $service)
-                                                    <option value="{{ $service->id }}">{{ $service->name }}</option>
-                                                @endforeach
-                                            </select>
-                                            @error('service_id') <span class="mt-1 text-sm text-red-600">{{ $message }}</span> @enderror
-                                        </div>
+                                                    <div>
+                                                        <label for="hours" class="block text-base font-medium text-gray-700 dark:text-gray-300">Hours</label>
+                                                        <input type="number" wire:model.live="hours" id="hours" step="0.25" min="0.25" max="24" required
+                                                               class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                        @error('hours') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                    </div>
 
-                                        <div>
-                                            <label for="hours" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Hours</label>
-                                            <input type="number" wire:model.live="hours" id="hours" step="0.25" min="0.25" max="24" required
-                                                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 sm:text-sm">
-                                            @error('hours') <span class="mt-1 text-sm text-red-600">{{ $message }}</span> @enderror
-                                        </div>
+                                                    @if($service_id)
+                                                        <div>
+                                                            <label class="block text-base font-medium text-gray-700 dark:text-gray-300">Rate per Hour</label>
+                                                            <div class="mt-2 text-lg text-gray-900 dark:text-gray-100 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                                                                ${{ number_format($selectedServiceRate, 2) }}
+                                                            </div>
+                                                        </div>
+                                                    @endif
 
-                                        @if($service_id)
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Rate per Hour</label>
-                                                <div class="mt-1 text-sm text-gray-900 dark:text-gray-100">
-                                                    ${{ number_format($selectedServiceRate, 2) }}
+                                                    <div class="md:col-span-2">
+                                                        <label for="location" class="block text-base font-medium text-gray-700 dark:text-gray-300">Location</label>
+                                                        <div class="mt-2 relative">
+                                                            <select wire:model.live="selectedLocation" id="location-select" 
+                                                                    class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                                <option value="">Select a saved location or type a new one</option>
+                                                                @foreach($savedLocations as $location)
+                                                                    <option value="{{ $location->name }}">{{ $location->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                            <input type="text" wire:model.live="location" id="location"
+                                                                   class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3"
+                                                                   placeholder="Or type a new location">
+                                                        </div>
+                                                        @error('location') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                    </div>
+
+                                                    <div class="md:col-span-2">
+                                                        <label for="notes" class="block text-base font-medium text-gray-700 dark:text-gray-300">Notes</label>
+                                                        <textarea wire:model="notes" id="notes" rows="4"
+                                                                  class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3"></textarea>
+                                                        @error('notes') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        @endif
 
-                                        <div>
-                                            <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
-                                            <input type="text" wire:model.live="location" id="location"
-                                                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 sm:text-sm">
-                                            @error('location') <span class="mt-1 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                <div class="mt-6 flex justify-end space-x-4">
+                                                    <button type="button" 
+                                                            @click="$wire.showModal = false"
+                                                            class="inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-3 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                                        Cancel
+                                                    </button>
+                                                    <button type="submit" 
+                                                            class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                                        {{ $timeLogId ? 'Update' : 'Create' }}
+                                                    </button>
+                                                </div>
+                                            </form>
                                         </div>
-
-                                        <div>
-                                            <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes</label>
-                                            <textarea wire:model.live="notes" id="notes" rows="3"
-                                                      class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 sm:text-sm"></textarea>
-                                            @error('notes') <span class="mt-1 text-sm text-red-600">{{ $message }}</span> @enderror
-                                        </div>
-
-                                        <div class="mt-5 sm:mt-6 flex justify-end space-x-3">
-                                            <button type="button" 
-                                                    @click="$wire.showModal = false"
-                                                    class="inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:text-sm">
-                                                Cancel
-                                            </button>
-                                            <button type="submit" 
-                                                    class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:text-sm">
-                                                {{ $timeLogId ? 'Update' : 'Create' }}
-                                            </button>
-                                        </div>
-                                    </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
