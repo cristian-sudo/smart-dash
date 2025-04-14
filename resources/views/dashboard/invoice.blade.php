@@ -19,14 +19,26 @@
             </div>
             <div>
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">To:</h2>
-                <p class="text-gray-600 dark:text-gray-400">{{ auth()->user()->name }}</p>
+                <p class="text-gray-600 dark:text-gray-400">{{ $invoice->client->name }}</p>
+                @if($invoice->client->email)
+                    <p class="text-gray-600 dark:text-gray-400">{{ $invoice->client->email }}</p>
+                @endif
+                @if($invoice->client->phone)
+                    <p class="text-gray-600 dark:text-gray-400">{{ $invoice->client->phone }}</p>
+                @endif
+                @if($invoice->client->address)
+                    <p class="text-gray-600 dark:text-gray-400">{{ $invoice->client->address }}</p>
+                @endif
             </div>
         </div>
 
         <!-- Invoice Details -->
         <div class="mb-8">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Invoice Period:</h2>
-            <p class="text-gray-600 dark:text-gray-400">{{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}</p>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Invoice Details:</h2>
+            <p class="text-gray-600 dark:text-gray-400">Invoice #: {{ $invoice->invoice_number }}</p>
+            <p class="text-gray-600 dark:text-gray-400">Date: {{ \Carbon\Carbon::parse($invoice->date)->format('M d, Y') }}</p>
+            <p class="text-gray-600 dark:text-gray-400">Due Date: {{ \Carbon\Carbon::parse($invoice->due_date)->format('M d, Y') }}</p>
+            <p class="text-gray-600 dark:text-gray-400">Status: {{ ucfirst($invoice->status) }}</p>
         </div>
 
         <!-- Time Logs Table -->

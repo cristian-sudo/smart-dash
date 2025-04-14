@@ -6,7 +6,7 @@
     <style>
         @page {
             margin: 0;
-            size: A4;
+            size: A4 portrait;
         }
         body {
             font-family: sans-serif;
@@ -16,7 +16,9 @@
             height: 297mm;
         }
         .container {
-            width: 98%;
+            width: 100%;
+            max-width: 190mm;
+            margin: 0 auto;
             padding: 1rem;
             box-sizing: border-box;
         }
@@ -26,33 +28,55 @@
             align-items: flex-start;
             margin-bottom: 2rem;
         }
+        .header-left {
+            flex: 1;
+            padding-right: 1rem;
+        }
+        .header-right {
+            flex: 1;
+            text-align: right;
+            padding-left: 1rem;
+        }
         .header-left h1 {
-            font-size: 1.875rem;
+            font-size: 80px;
             font-weight: 700;
             color: #111827;
             margin: 0;
         }
         .header-left p {
+            font-size: 48px;
             color: #4B5563;
             margin: 0;
         }
         .header-right p {
+            font-size: 48px;
             color: #4B5563;
             margin: 0;
         }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+        .from-to-container {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 2rem;
         }
+        .from-to-section {
+            flex: 1;
+            padding: 0 0.25rem;
+        }
+        .from-to-section:first-child {
+            padding-left: 0;
+        }
+        .from-to-section:last-child {
+            padding-right: 0;
+            text-align: right;
+        }
         .section-title {
-            font-size: 1.125rem;
+            font-size: 60px;
             font-weight: 600;
             color: #111827;
             margin-bottom: 0.5rem;
         }
         .text-gray {
+            font-size: 44px;
             color: #4B5563;
         }
         .text-white {
@@ -77,9 +101,10 @@
             width: 100%;
             border-collapse: collapse;
             margin: 1rem 0;
+            font-size: 44px;
         }
         th, td {
-            padding: 0.75rem 1.5rem;
+            padding: 0.5rem 1rem;
             text-align: left;
             border-bottom: 1px solid #E5E7EB;
         }
@@ -87,8 +112,8 @@
             background-color: #F9FAFB;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.75rem;
             color: #6B7280;
+            white-space: nowrap;
         }
         td {
             color: #4B5563;
@@ -99,11 +124,11 @@
         .font-semibold {
             font-weight: 600;
         }
-        .mt-8 {
-            margin-top: 2rem;
+        .mt-4 {
+            margin-top: 1.5rem;
         }
-        .pt-8 {
-            padding-top: 2rem;
+        .pt-4 {
+            padding-top: 1.5rem;
         }
         .border-t {
             border-top: 1px solid #E5E7EB;
@@ -111,8 +136,14 @@
         .text-center {
             text-align: center;
         }
-        .text-sm {
-            font-size: 0.875rem;
+        .mb-4 {
+            margin-bottom: 1.5rem;
+        }
+        .mb-1 {
+            margin-bottom: 0.5rem;
+        }
+        .mt-1 {
+            margin-top: 0.5rem;
         }
     </style>
 </head>
@@ -122,41 +153,48 @@
         <div class="header">
             <div class="header-left">
                 <h1>Invoice</h1>
-                <p>{{ config('app.name') }}</p>
+                <p class="text-gray">{{ config('app.name') }}</p>
             </div>
             <div class="header-right">
-                <p>Date Generated: {{ now()->format('M d, Y') }}</p>
+                <p class="text-gray">Date Generated: {{ now()->format('M d, Y') }}</p>
+                <p class="text-gray">Invoice #: {{ $invoice->invoice_number }}</p>
+                <p class="text-gray">Date: {{ \Carbon\Carbon::parse($invoice->date)->format('M d, Y') }}</p>
+                <p class="text-gray">Due Date: {{ \Carbon\Carbon::parse($invoice->due_date)->format('M d, Y') }}</p>
+                <p class="text-gray">Status: {{ ucfirst($invoice->status) }}</p>
             </div>
         </div>
 
         <!-- Company and Client Info -->
-        <div class="grid">
-            <div>
+        <div class="from-to-container">
+            <div class="from-to-section">
                 <h2 class="section-title">From:</h2>
                 <p class="text-gray">{{ config('app.name') }}</p>
             </div>
-            <div>
+            <div class="from-to-section">
                 <h2 class="section-title">To:</h2>
-                <p class="text-gray">{{ auth()->user()->name }}</p>
+                <p class="text-gray">{{ $invoice->client->name }}</p>
+                @if($invoice->client->email)
+                    <p class="text-gray">{{ $invoice->client->email }}</p>
+                @endif
+                @if($invoice->client->phone)
+                    <p class="text-gray">{{ $invoice->client->phone }}</p>
+                @endif
+                @if($invoice->client->address)
+                    <p class="text-gray">{{ $invoice->client->address }}</p>
+                @endif
             </div>
         </div>
 
-        <!-- Invoice Details -->
-        <div style="margin-bottom: 2rem;">
-            <h2 class="section-title">Invoice Period:</h2>
-            <p class="text-gray">{{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}</p>
-        </div>
-
         <!-- Time Logs Table -->
-        <div style="margin-bottom: 2rem;">
+        <div class="mb-4">
             <table>
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Service</th>
-                        <th>Hours</th>
-                        <th>Location</th>
-                        <th class="text-right">Price</th>
+                        <th style="width: 20%">Date</th>
+                        <th style="width: 25%">Service</th>
+                        <th style="width: 5%">Hrs</th>
+                        <th style="width: 10%">Location</th>
+                        <th style="width: 40%" class="text-right">Price</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -184,9 +222,9 @@
         </div>
 
         <!-- Footer -->
-        <div class="mt-8 pt-8 border-t">
+        <div class="mt-4 pt-4 border-t">
             <p class="text-center text-gray">Thank you for your business!</p>
-            <p class="text-center text-sm text-gray" style="margin-top: 0.5rem;">This is a computer-generated invoice. No signature is required.</p>
+            <p class="text-center text-gray mt-1">This is a computer-generated invoice. No signature is required.</p>
         </div>
     </div>
 </body>

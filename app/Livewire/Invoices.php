@@ -8,9 +8,12 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Traits\WithNotifications;
+use App\Models\Client;
 
 class Invoices extends Component
 {
+    use WithNotifications;
     use WithPagination;
 
     public $sort = 'desc';
@@ -21,11 +24,35 @@ class Invoices extends Component
     public $message = '';
     public $show = false;
     public $previewId = null;
+    public $notificationMessage = '';
+    public $invoiceId = null;
+    public $clients = [];
+    public $client_id = '';
+    public $date = '';
+    public $due_date = '';
+    public $status = 'draft';
+    public $notes = '';
+    public $availableTimeLogs = [];
+    public $showNotification = false;
+
+    protected $listeners = ['refreshInvoices' => '$refresh'];
 
     public function mount()
     {
         $this->sort = request('sort', 'desc');
         $this->previewId = request('preview');
+        $this->clients = \App\Models\Client::where('user_id', auth()->id())->get();
+        $this->date = now()->format('Y-m-d');
+        $this->due_date = now()->addDays(30)->format('Y-m-d');
+        $this->loadAvailableTimeLogs();
+    }
+
+    public function loadAvailableTimeLogs()
+    {
+        $this->availableTimeLogs = TimeLog::where('user_id', auth()->id())
+            ->whereNull('invoice_id')
+            ->orderBy('date', 'desc')
+            ->get();
     }
 
     public function toggleSort()
@@ -34,70 +61,87 @@ class Invoices extends Component
         $this->resetPage();
     }
 
+    public function create()
+    {
+        $this->reset(['invoiceId', 'client_id', 'date', 'due_date', 'status', 'notes', 'selectedTimeLogs']);
+        $this->loadAvailableTimeLogs();
+        $this->dispatch('open-modal');
+    }
+
     public function edit($id)
     {
-        $invoice = Invoice::find($id);
-        $this->editingId = $id;
-        $this->name = $invoice->name;
+        $invoice = Invoice::findOrFail($id);
+        $this->invoiceId = $invoice->id;
+        $this->client_id = $invoice->client_id;
+        $this->date = $invoice->date->format('Y-m-d');
+        $this->due_date = $invoice->due_date->format('Y-m-d');
+        $this->status = $invoice->status;
+        $this->notes = $invoice->notes;
         $this->selectedTimeLogs = $invoice->timeLogs->pluck('id')->toArray();
-        $this->showModal = true;
+        $this->loadAvailableTimeLogs();
+        $this->dispatch('open-modal');
     }
 
     public function save()
     {
         $this->validate([
-            'name' => 'required|string|max:255',
+            'client_id' => 'required|exists:clients,id',
+            'date' => 'required|date',
+            'due_date' => 'required|date|after_or_equal:date',
+            'status' => 'required|in:draft,sent,paid,overdue',
             'selectedTimeLogs' => 'required|array|min:1',
             'selectedTimeLogs.*' => 'exists:time_logs,id',
         ]);
 
-        $timeLogs = TimeLog::whereIn('id', $this->selectedTimeLogs)
-            ->where('user_id', Auth::id())
-            ->with('service')
-            ->orderBy('date')
-            ->get();
+        $totalHours = TimeLog::whereIn('id', $this->selectedTimeLogs)->sum('hours');
+        $totalAmount = $totalHours * 100; // Assuming $100 per hour
 
-        if ($timeLogs->isEmpty()) {
-            $this->message = 'No time logs selected.';
-            $this->show = true;
-            return;
-        }
-
-        $totalHours = $timeLogs->sum('hours');
-        $totalAmount = $timeLogs->sum(function($log) {
-            return $log->rate * $log->hours;
-        });
-
-        if ($this->editingId) {
-            $invoice = Invoice::find($this->editingId);
+        if ($this->invoiceId) {
+            $invoice = Invoice::findOrFail($this->invoiceId);
+            
+            // Remove invoice_id from previously associated time logs
+            TimeLog::where('invoice_id', $invoice->id)->update(['invoice_id' => null]);
+            
             $invoice->update([
-                'name' => $this->name,
+                'client_id' => $this->client_id,
+                'date' => $this->date,
+                'due_date' => $this->due_date,
+                'status' => $this->status,
+                'notes' => $this->notes,
                 'total_hours' => $totalHours,
-                'total_amount' => $totalAmount,
+                'total' => $totalAmount,
             ]);
-            $invoice->timeLogs()->sync($timeLogs->pluck('id'));
-            $this->message = 'Invoice updated successfully!';
         } else {
             $invoice = Invoice::create([
-                'user_id' => Auth::id(),
-                'name' => $this->name,
+                'user_id' => auth()->id(),
+                'client_id' => $this->client_id,
+                'date' => $this->date,
+                'due_date' => $this->due_date,
+                'status' => $this->status,
+                'notes' => $this->notes,
                 'total_hours' => $totalHours,
-                'total_amount' => $totalAmount,
+                'total' => $totalAmount,
             ]);
-            $invoice->timeLogs()->sync($timeLogs->pluck('id'));
-            $this->message = 'Invoice created successfully!';
         }
 
-        $this->show = true;
-        $this->reset(['showModal', 'editingId', 'name', 'selectedTimeLogs']);
+        // Update time logs with invoice_id
+        TimeLog::whereIn('id', $this->selectedTimeLogs)->update(['invoice_id' => $invoice->id]);
+
+        $this->reset(['invoiceId', 'client_id', 'date', 'due_date', 'status', 'notes', 'selectedTimeLogs']);
+        $this->loadAvailableTimeLogs();
+        $this->dispatch('close-modal');
+        $this->showNotification('Invoice ' . ($this->invoiceId ? 'updated' : 'created') . ' successfully!');
     }
 
     public function delete($id)
     {
-        $invoice = Invoice::find($id);
+        $invoice = Invoice::findOrFail($id);
+        
+        // Remove invoice_id from associated time logs
+        TimeLog::where('invoice_id', $invoice->id)->update(['invoice_id' => null]);
+        
         $invoice->delete();
-        $this->message = 'Invoice deleted successfully!';
-        $this->show = true;
+        $this->showNotification('Invoice deleted successfully!');
     }
 
     public function download($id)
@@ -108,9 +152,7 @@ class Invoices extends Component
         $pdf = PDF::loadView('dashboard.invoice-pdf', [
             'timeLogs' => $timeLogs,
             'totalHours' => $invoice->total_hours,
-            'totalAmount' => $invoice->total_amount,
-            'startDate' => $timeLogs->first()->date,
-            'endDate' => $timeLogs->last()->date,
+            'totalAmount' => $invoice->total,
             'invoice' => $invoice
         ]);
 
@@ -135,10 +177,23 @@ class Invoices extends Component
         $this->previewId = $this->previewId === $id ? null : $id;
     }
 
+    public function markAsPaid($id)
+    {
+        $invoice = Invoice::findOrFail($id);
+        $invoice->update(['status' => 'paid']);
+        $this->showNotification('Invoice marked as paid successfully!');
+    }
+
+    public function showNotification($message)
+    {
+        $this->notificationMessage = $message;
+        $this->showNotification = true;
+    }
+
     public function render()
     {
         $invoices = Invoice::where('user_id', Auth::id())
-            ->with(['timeLogs.service'])
+            ->with(['timeLogs.service', 'client'])
             ->orderBy('created_at', $this->sort)
             ->paginate(10);
 
@@ -151,6 +206,9 @@ class Invoices extends Component
         return view('livewire.invoices', [
             'invoices' => $invoices,
             'availableTimeLogs' => $availableTimeLogs,
+            'clients' => Client::where('user_id', auth()->id())
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 }

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Invoice extends Model
 {
@@ -13,17 +13,20 @@ class Invoice extends Model
 
     protected $fillable = [
         'user_id',
-        'invoice_number',
-        'name',
-        'total_hours',
-        'total_amount',
-        'notes',
+        'client_id',
+        'date',
+        'due_date',
         'status',
+        'notes',
+        'total_hours',
+        'total',
+        'invoice_number',
     ];
 
     protected $casts = [
-        'total_hours' => 'decimal:2',
-        'total_amount' => 'decimal:2',
+        'date' => 'date',
+        'due_date' => 'date',
+        'total' => 'decimal:2',
     ];
 
     public function user(): BelongsTo
@@ -31,10 +34,14 @@ class Invoice extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function timeLogs(): BelongsToMany
+    public function client(): BelongsTo
     {
-        return $this->belongsToMany(TimeLog::class, 'invoice_time_logs')
-            ->withTimestamps();
+        return $this->belongsTo(Client::class);
+    }
+
+    public function timeLogs(): HasMany
+    {
+        return $this->hasMany(TimeLog::class);
     }
 
     protected static function boot()

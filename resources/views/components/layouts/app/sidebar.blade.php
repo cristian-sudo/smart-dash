@@ -17,6 +17,7 @@
                     <flux:navlist.item icon="clock" :href="route('time-logs.index')" :current="request()->routeIs('time-logs.*')" wire:navigate>{{ __('Time Logs') }}</flux:navlist.item>
                     <flux:navlist.item icon="document-text" :href="route('invoices.index')" :current="request()->routeIs('invoices.*')" wire:navigate>{{ __('Invoices') }}</flux:navlist.item>
                     <flux:navlist.item icon="briefcase" :href="route('services.index')" :current="request()->routeIs('services.*')" wire:navigate>{{ __('Services') }}</flux:navlist.item>
+                    <flux:navlist.item icon="users" :href="route('clients.index')" :current="request()->routeIs('clients.*')" wire:navigate>{{ __('Clients') }}</flux:navlist.item>
                     <flux:navlist.item icon="home" :href="route('home')" :current="request()->routeIs('home')" target="_blank">{{ __('Home') }}</flux:navlist.item>
 
                 </flux:navlist.group>

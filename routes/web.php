@@ -104,6 +104,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
         Route::put('/services/{service}', [ServiceController::class, 'update'])->name('services.update');
         Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
+
+        // Clients Route
+        Route::get('/clients', function () {
+            return view('dashboard.clients');
+        })->name('clients.index');
     });
 
     Route::redirect('settings', 'settings/profile');
