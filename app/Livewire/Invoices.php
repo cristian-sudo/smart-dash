@@ -238,12 +238,25 @@ class Invoices extends Component
     public function sendInvoice()
     {
         $invoice = Invoice::find($this->invoiceId);
+        $timeLogs = $invoice->timeLogs()->with('service')->orderBy('date')->get();
+        
         $pdf = PDF::loadView('dashboard.invoice-pdf', [
-            'invoice' => $invoice,
-            'timeLogs' => $invoice->timeLogs,
+            'timeLogs' => $timeLogs,
             'totalHours' => $invoice->total_hours,
             'totalAmount' => $invoice->total,
+            'invoice' => $invoice
         ]);
+
+        $pdf->setPaper('A4');
+        $pdf->setOption('isHtml5ParserEnabled', true);
+        $pdf->setOption('isPhpEnabled', true);
+        $pdf->setOption('isRemoteEnabled', true);
+        $pdf->setOption('dpi', 300);
+        $pdf->setOption('defaultFont', 'sans-serif');
+        $pdf->setOption('margin-top', 0);
+        $pdf->setOption('margin-right', 0);
+        $pdf->setOption('margin-bottom', 0);
+        $pdf->setOption('margin-left', 0);
 
         try {
             Mail::to($invoice->client->email)
