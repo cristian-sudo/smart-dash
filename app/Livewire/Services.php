@@ -3,76 +3,94 @@
 namespace App\Livewire;
 
 use App\Models\Service;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Livewire\WithPagination;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Rule;
 
 class Services extends Component
 {
-    public $showModal = false;
-    public $isEditing = false;
-    public $serviceId = null;
+    use WithPagination;
 
     #[Rule('required|string|max:255')]
     public $name = '';
 
-    #[Rule('nullable|string')]
-    public $description = '';
-
     #[Rule('required|numeric|min:0')]
     public $rate = '';
 
+    #[Rule('nullable|string')]
+    public $description = '';
+
+    public $editingId = null;
+    public $showModal = false;
+    public $notificationMessage = '';
+    public $show = false;
+
+    public function mount()
+    {
+        $this->rate = 0;
+    }
+
     public function create()
     {
-        $this->reset(['name', 'description', 'rate', 'serviceId', 'isEditing']);
+        $this->reset(['name', 'rate', 'description', 'editingId']);
         $this->showModal = true;
     }
 
-    public function edit(Service $service)
+    public function edit($id)
     {
-        $this->serviceId = $service->id;
+        $service = Service::find($id);
+        $this->editingId = $id;
         $this->name = $service->name;
-        $this->description = $service->description;
         $this->rate = $service->rate;
-        $this->isEditing = true;
+        $this->description = $service->description;
         $this->showModal = true;
+    }
+
+    public function closeModal()
+    {
+        $this->showModal = false;
+        $this->reset(['name', 'rate', 'description', 'editingId']);
     }
 
     public function save()
     {
         $this->validate();
 
-        if ($this->isEditing) {
-            $service = Service::find($this->serviceId);
-            $service->update([
-                'name' => $this->name,
-                'description' => $this->description,
-                'rate' => $this->rate,
-            ]);
-            $this->dispatch('notify', ['message' => 'Service updated successfully.']);
+        $data = [
+            'user_id' => auth()->id(),
+            'name' => $this->name,
+            'rate' => $this->rate,
+            'description' => $this->description,
+        ];
+
+        if ($this->editingId) {
+            Service::find($this->editingId)->update($data);
+            $this->notificationMessage = 'Service updated successfully.';
         } else {
-            Service::create([
-                'user_id' => Auth::id(),
-                'name' => $this->name,
-                'description' => $this->description,
-                'rate' => $this->rate,
-            ]);
-            $this->dispatch('notify', ['message' => 'Service created successfully.']);
+            Service::create($data);
+            $this->notificationMessage = 'Service created successfully.';
         }
 
-        $this->reset(['showModal', 'name', 'description', 'rate', 'serviceId', 'isEditing']);
+        $this->show = true;
+        $this->closeModal();
     }
 
-    public function delete(Service $service)
+    public function delete($id)
     {
-        $service->delete();
-        $this->dispatch('notify', ['message' => 'Service deleted successfully.']);
+        Service::find($id)->delete();
+        $this->notificationMessage = 'Service deleted successfully.';
+        $this->show = true;
     }
 
     public function render()
     {
+        $services = Service::where('user_id', Auth::id())
+            ->orderBy('name')
+            ->paginate(10);
+
         return view('livewire.services', [
-            'services' => Service::where('user_id', Auth::id())->get()
+            'services' => $services,
         ]);
     }
 } 

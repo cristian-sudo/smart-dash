@@ -19,212 +19,200 @@
             width: 100%;
             max-width: 190mm;
             margin: 0 auto;
-            padding: 1rem;
+            padding: 2rem;
             box-sizing: border-box;
         }
         .header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 2rem;
+            margin-bottom: 4rem;
         }
         .header-left {
             flex: 1;
-            padding-right: 1rem;
         }
-        .header-right {
-            flex: 1;
-            text-align: right;
-            padding-left: 1rem;
+        .logo {
+            max-height: 500px;
+            min-height: 400px;
+            width: auto;
+            margin-bottom: 3rem;
+            object-fit: contain;
         }
-        .header-left h1 {
+        .title {
             font-size: 80px;
-            font-weight: 700;
+            font-weight: bold;
             color: #111827;
             margin: 0;
+            margin-bottom: 1rem;
         }
-        .header-left p {
-            font-size: 48px;
-            color: #4B5563;
-            margin: 0;
-        }
-        .header-right p {
-            font-size: 48px;
-            color: #4B5563;
-            margin: 0;
-        }
-        .from-to-container {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-        }
-        .from-to-section {
-            flex: 1;
-            padding: 0 0.25rem;
-        }
-        .from-to-section:first-child {
-            padding-left: 0;
-        }
-        .from-to-section:last-child {
-            padding-right: 0;
-            text-align: right;
-        }
-        .section-title {
-            font-size: 60px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 0.5rem;
-        }
-        .text-gray {
+        .company-name {
             font-size: 44px;
             color: #4B5563;
+            margin: 0;
         }
-        .text-white {
-            color: #FFFFFF;
+        .info-grid {
+            width: 100%;
+            display: table;
+            table-layout: fixed;
+            margin-bottom: 4rem;
         }
-        .bg-gray-50 {
-            background-color: #F9FAFB;
+        .info-section {
+            display: table-cell;
+            width: 33.333%;
+            vertical-align: top;
+            padding-right: 2rem;
         }
-        .bg-gray-700 {
-            background-color: #374151;
+        .info-section:last-child {
+            padding-right: 0;
         }
-        .divide-y {
-            border-bottom: 1px solid #E5E7EB;
+        .section-title {
+            font-size: 44px;
+            font-weight: 600;
+            color: #111827;
+            margin: 0;
+            margin-bottom: 2rem;
         }
-        .divide-gray-200 {
-            border-color: #E5E7EB;
-        }
-        .divide-gray-700 {
-            border-color: #374151;
+        .info-text {
+            font-size: 36px;
+            color: #4B5563;
+            margin: 1rem 0;
+            line-height: 1.4;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 1rem 0;
-            font-size: 44px;
-        }
-        th, td {
-            padding: 0.5rem 1rem;
-            text-align: left;
-            border-bottom: 1px solid #E5E7EB;
+            margin: 3rem 0;
         }
         th {
             background-color: #F9FAFB;
+            padding: 1.5rem 1rem;
+            text-align: left;
             font-weight: 600;
+            color: #374151;
             text-transform: uppercase;
-            color: #6B7280;
-            white-space: nowrap;
+            font-size: 34px;
         }
         td {
+            padding: 1.5rem 1rem;
             color: #4B5563;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 34px;
         }
         .text-right {
             text-align: right;
         }
-        .font-semibold {
-            font-weight: 600;
-        }
-        .mt-4 {
-            margin-top: 1.5rem;
-        }
-        .pt-4 {
-            padding-top: 1.5rem;
-        }
-        .border-t {
+        .footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
             border-top: 1px solid #E5E7EB;
-        }
-        .text-center {
             text-align: center;
+            font-size: 34px;
+            color: #6B7280;
         }
-        .mb-4 {
-            margin-bottom: 1.5rem;
-        }
-        .mb-1 {
-            margin-bottom: 0.5rem;
-        }
-        .mt-1 {
-            margin-top: 0.5rem;
+        .footer p {
+            margin: 1rem 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        @if($invoice->company && $invoice->company->color)
+            <div style="height: 24px; width: 100%; background-color: {{ $invoice->company->color }}; margin-bottom: 2rem;"></div>
+        @endif
         <!-- Header -->
         <div class="header">
             <div class="header-left">
-                <h1>Invoice</h1>
-                <p class="text-gray">{{ config('app.name') }}</p>
-            </div>
-            <div class="header-right">
-                <p class="text-gray">Date Generated: {{ now()->format('M d, Y') }}</p>
-                <p class="text-gray">Invoice #: {{ $invoice->invoice_number }}</p>
-                <p class="text-gray">Date: {{ \Carbon\Carbon::parse($invoice->date)->format('M d, Y') }}</p>
-                <p class="text-gray">Due Date: {{ \Carbon\Carbon::parse($invoice->due_date)->format('M d, Y') }}</p>
-                <p class="text-gray">Status: {{ ucfirst($invoice->status) }}</p>
+                @if($invoice->company && $invoice->company->logo && Storage::disk('public')->exists($invoice->company->logo))
+                    <img src="data:image/png;base64,{{ base64_encode(Storage::disk('public')->get($invoice->company->logo)) }}" alt="Company Logo" class="logo" style="max-width: 600px; min-width: 400px;">
+                @endif
+                <h1 class="title">Invoice</h1>
+                <p class="company-name">{{ $invoice->company ? $invoice->company->name : config('app.name') }}</p>
             </div>
         </div>
 
-        <!-- Company and Client Info -->
-        <div class="from-to-container">
-            <div class="from-to-section">
+        <!-- Info Grid -->
+        <div class="info-grid">
+            <!-- From Section -->
+            <div class="info-section">
                 <h2 class="section-title">From:</h2>
-                <p class="text-gray">{{ config('app.name') }}</p>
+                @if($invoice->company)
+                    <p class="info-text">{{ $invoice->company->name }}</p>
+                    @if($invoice->company->email)
+                        <p class="info-text">{{ $invoice->company->email }}</p>
+                    @endif
+                    @if($invoice->company->phone)
+                        <p class="info-text">{{ $invoice->company->phone }}</p>
+                    @endif
+                    @if($invoice->company->address)
+                        <p class="info-text">{{ $invoice->company->address }}</p>
+                    @endif
+                @else
+                    <p class="info-text">{{ config('app.name') }}</p>
+                @endif
             </div>
-            <div class="from-to-section">
+
+            <!-- To Section -->
+            <div class="info-section">
                 <h2 class="section-title">To:</h2>
-                <p class="text-gray">{{ $invoice->client->name }}</p>
+                <p class="info-text">{{ $invoice->client->name }}</p>
                 @if($invoice->client->email)
-                    <p class="text-gray">{{ $invoice->client->email }}</p>
+                    <p class="info-text">{{ $invoice->client->email }}</p>
                 @endif
                 @if($invoice->client->phone)
-                    <p class="text-gray">{{ $invoice->client->phone }}</p>
+                    <p class="info-text">{{ $invoice->client->phone }}</p>
                 @endif
                 @if($invoice->client->address)
-                    <p class="text-gray">{{ $invoice->client->address }}</p>
+                    <p class="info-text">{{ $invoice->client->address }}</p>
                 @endif
+            </div>
+
+            <!-- Invoice Details Section -->
+            <div class="info-section">
+                <h2 class="section-title">Invoice Details:</h2>
+                <p class="info-text">Invoice #: {{ $invoice->invoice_number }}</p>
+                <p class="info-text">Date: {{ \Carbon\Carbon::parse($invoice->date)->format('M d, Y') }}</p>
+                <p class="info-text">Due Date: {{ \Carbon\Carbon::parse($invoice->due_date)->format('M d, Y') }}</p>
             </div>
         </div>
 
         <!-- Time Logs Table -->
-        <div class="mb-4">
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 20%">Date</th>
-                        <th style="width: 25%">Service</th>
-                        <th style="width: 5%">Hrs</th>
-                        <th style="width: 10%">Location</th>
-                        <th style="width: 40%" class="text-right">Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($timeLogs as $log)
-                    <tr>
-                        <td>{{ $log->date->format('M d, Y') }}</td>
-                        <td>{{ $log->service->name }}</td>
-                        <td>{{ $log->hours }}</td>
-                        <td>{{ $log->location }}</td>
-                        <td class="text-right">${{ number_format($log->service->calculatePriceForHours($log->hours), 2) }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="4" class="text-right font-semibold">Total Hours:</td>
-                        <td class="text-right font-semibold">{{ $totalHours }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="4" class="text-right font-semibold">Total Amount:</td>
-                        <td class="text-right font-semibold">${{ number_format($totalAmount, 2) }}</td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 15%">Date</th>
+                    <th style="width: 30%">Service</th>
+                    <th style="width: 10%">Hrs</th>
+                    <th style="width: 25%">Location</th>
+                    <th style="width: 20%" class="text-right">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($timeLogs as $log)
+                <tr>
+                    <td>{{ $log->date->format('M d, Y') }}</td>
+                    <td>{{ $log->service->name }}</td>
+                    <td>{{ $log->hours }}</td>
+                    <td>{{ $log->location }}</td>
+                    <td class="text-right">${{ number_format($log->service->calculatePriceForHours($log->hours), 2) }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" class="text-right" style="font-weight: 600;">Total Hours:</td>
+                    <td class="text-right" style="font-weight: 600;">{{ $totalHours }}</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="text-right" style="font-weight: 600;">Total Amount:</td>
+                    <td class="text-right" style="font-weight: 600;">${{ number_format($totalAmount, 2) }}</td>
+                </tr>
+            </tfoot>
+        </table>
 
         <!-- Footer -->
-        <div class="mt-4 pt-4 border-t">
-            <p class="text-center text-gray">Thank you for your business!</p>
-            <p class="text-center text-gray mt-1">This is a computer-generated invoice. No signature is required.</p>
+        <div class="footer">
+            <p>Thank you for your business!</p>
+            <p>This is a computer-generated invoice. No signature is required.</p>
         </div>
     </div>
 </body>

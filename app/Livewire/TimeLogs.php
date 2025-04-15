@@ -36,6 +36,7 @@ class TimeLogs extends Component
     public $timeLogId = null;
     public $selectedLocation = '';
     public $savedLocations = [];
+    public $showModal = false;
 
     public function mount()
     {
@@ -78,6 +79,7 @@ class TimeLogs extends Component
         $this->reset(['date', 'service_id', 'hours', 'location', 'notes', 'timeLogId', 'isEditing']);
         $this->date = now()->format('Y-m-d');
         $this->hours = 8;
+        $this->showModal = true;
     }
 
     public function edit(TimeLog $timeLog)
@@ -89,7 +91,12 @@ class TimeLogs extends Component
         $this->location = $timeLog->location;
         $this->notes = $timeLog->notes;
         $this->isEditing = true;
-        $this->dispatch('open-modal');
+        $this->showModal = true;
+    }
+
+    public function closeModal()
+    {
+        $this->showModal = false;
     }
 
     public function save()
@@ -127,11 +134,10 @@ class TimeLogs extends Component
         }
 
         // Reset only the necessary properties
-        $this->reset(['date', 'service_id', 'hours', 'location', 'notes', 'timeLogId', 'isEditing', 'selectedLocation']);
+        $this->reset(['date', 'service_id', 'hours', 'location', 'notes', 'timeLogId', 'isEditing', 'selectedLocation', 'showModal']);
         $this->date = now()->format('Y-m-d');
         $this->hours = 8;
         $this->showNotification('Time log saved successfully!');
-        $this->dispatch('close-modal');
     }
 
     public function delete(TimeLog $timeLog)

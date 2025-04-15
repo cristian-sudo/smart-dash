@@ -14,6 +14,7 @@ class Invoice extends Model
     protected $fillable = [
         'user_id',
         'client_id',
+        'company_id',
         'date',
         'due_date',
         'status',
@@ -24,8 +25,9 @@ class Invoice extends Model
     ];
 
     protected $casts = [
-        'date' => 'date',
-        'due_date' => 'date',
+        'date' => 'datetime',
+        'due_date' => 'datetime',
+        'total_hours' => 'decimal:2',
         'total' => 'decimal:2',
     ];
 
@@ -37,6 +39,11 @@ class Invoice extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
     }
 
     public function timeLogs(): HasMany
