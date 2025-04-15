@@ -57,6 +57,7 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 2rem;
+            gap: 2rem;
         }
         .from-to-section {
             flex: 1;
@@ -67,7 +68,6 @@
         }
         .from-to-section:last-child {
             padding-right: 0;
-            text-align: right;
         }
         .section-title {
             font-size: 60px;
@@ -152,11 +152,11 @@
         <!-- Header -->
         <div class="header">
             <div class="header-left">
-                @if(auth()->user()->logo && file_exists(auth()->user()->logo_path))
-                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(auth()->user()->logo_path)) }}" alt="Company Logo" style="max-height: 300px; min-height: 250px; margin-bottom: 2rem; object-fit: contain;">
+                @if($invoice->company && $invoice->company->logo && Storage::disk('public')->exists($invoice->company->logo))
+                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(storage_path('app/public/' . $invoice->company->logo))) }}" alt="Company Logo" style="max-height: 300px; min-height: 250px; margin-bottom: 2rem; object-fit: contain;">
                 @endif
                 <h1>Invoice</h1>
-                <p class="text-gray">{{ config('app.name') }}</p>
+                <p class="text-gray">{{ $invoice->company ? $invoice->company->name : config('app.name') }}</p>
             </div>
             <div class="header-right">
                 <p class="text-gray">Date Generated: {{ now()->format('M d, Y') }}</p>
@@ -167,11 +167,30 @@
             </div>
         </div>
 
-        <!-- Company and Client Info -->
+        <!-- Company, Client, and Invoice Info -->
         <div class="from-to-container">
             <div class="from-to-section">
                 <h2 class="section-title">From:</h2>
-                <p class="text-gray">{{ config('app.name') }}</p>
+                @if($invoice->company)
+                    <p class="text-gray">{{ $invoice->company->name }}</p>
+                    @if($invoice->company->email)
+                        <p class="text-gray">{{ $invoice->company->email }}</p>
+                    @endif
+                    @if($invoice->company->phone)
+                        <p class="text-gray">{{ $invoice->company->phone }}</p>
+                    @endif
+                    @if($invoice->company->address)
+                        <p class="text-gray">{{ $invoice->company->address }}</p>
+                    @endif
+                    @if($invoice->company->tax_number)
+                        <p class="text-gray">Tax Number: {{ $invoice->company->tax_number }}</p>
+                    @endif
+                    @if($invoice->company->registration_number)
+                        <p class="text-gray">Reg Number: {{ $invoice->company->registration_number }}</p>
+                    @endif
+                @else
+                    <p class="text-gray">{{ config('app.name') }}</p>
+                @endif
             </div>
             <div class="from-to-section">
                 <h2 class="section-title">To:</h2>
@@ -185,6 +204,13 @@
                 @if($invoice->client->address)
                     <p class="text-gray">{{ $invoice->client->address }}</p>
                 @endif
+            </div>
+            <div class="from-to-section">
+                <h2 class="section-title">Invoice Details:</h2>
+                <p class="text-gray">Invoice #: {{ $invoice->invoice_number }}</p>
+                <p class="text-gray">Date: {{ \Carbon\Carbon::parse($invoice->date)->format('M d, Y') }}</p>
+                <p class="text-gray">Due Date: {{ \Carbon\Carbon::parse($invoice->due_date)->format('M d, Y') }}</p>
+                <p class="text-gray">Status: {{ ucfirst($invoice->status) }}</p>
             </div>
         </div>
 

@@ -102,22 +102,41 @@
                                                             <!-- Header -->
                                                             <div class="flex justify-between items-start mb-8">
                                                                 <div>
-                                                                    @if(auth()->user()->logo)
-                                                                        <img src="{{ auth()->user()->logo_url }}" alt="Company Logo" class="h-20 w-auto mb-4">
+                                                                    @if($invoice->company && $invoice->company->logo)
+                                                                        <img src="{{ Storage::url($invoice->company->logo) }}" alt="Company Logo" class="h-20 w-auto mb-4">
                                                                     @endif
                                                                     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Invoice</h1>
-                                                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ config('app.name') }}</p>
+                                                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ $invoice->company ? $invoice->company->name : config('app.name') }}</p>
                                                                 </div>
                                                                 <div class="text-right">
                                                                     <p class="text-sm text-gray-600 dark:text-gray-400">Date Generated: {{ now()->format('M d, Y') }}</p>
                                                                 </div>
                                                             </div>
 
-                                                            <!-- Company and Client Info -->
-                                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
+                                                            <!-- Company, Client, and Invoice Info -->
+                                                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
                                                                 <div>
                                                                     <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-2">From:</h2>
-                                                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ config('app.name') }}</p>
+                                                                    @if($invoice->company)
+                                                                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ $invoice->company->name }}</p>
+                                                                        @if($invoice->company->email)
+                                                                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ $invoice->company->email }}</p>
+                                                                        @endif
+                                                                        @if($invoice->company->phone)
+                                                                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ $invoice->company->phone }}</p>
+                                                                        @endif
+                                                                        @if($invoice->company->address)
+                                                                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ $invoice->company->address }}</p>
+                                                                        @endif
+                                                                        @if($invoice->company->tax_number)
+                                                                            <p class="text-sm text-gray-600 dark:text-gray-400">Tax Number: {{ $invoice->company->tax_number }}</p>
+                                                                        @endif
+                                                                        @if($invoice->company->registration_number)
+                                                                            <p class="text-sm text-gray-600 dark:text-gray-400">Reg Number: {{ $invoice->company->registration_number }}</p>
+                                                                        @endif
+                                                                    @else
+                                                                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ config('app.name') }}</p>
+                                                                    @endif
                                                                 </div>
                                                                 <div>
                                                                     <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-2">To:</h2>
@@ -132,15 +151,13 @@
                                                                         <p class="text-sm text-gray-600 dark:text-gray-400">{{ $invoice->client->address }}</p>
                                                                     @endif
                                                                 </div>
-                                                            </div>
-
-                                                            <!-- Invoice Details -->
-                                                            <div class="mb-8">
-                                                                <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-2">Invoice Details:</h2>
-                                                                <p class="text-sm text-gray-600 dark:text-gray-400">Invoice #: {{ $invoice->invoice_number }}</p>
-                                                                <p class="text-sm text-gray-600 dark:text-gray-400">Date: {{ \Carbon\Carbon::parse($invoice->date)->format('M d, Y') }}</p>
-                                                                <p class="text-sm text-gray-600 dark:text-gray-400">Due Date: {{ \Carbon\Carbon::parse($invoice->due_date)->format('M d, Y') }}</p>
-                                                                <p class="text-sm text-gray-600 dark:text-gray-400">Status: {{ ucfirst($invoice->status) }}</p>
+                                                                <div>
+                                                                    <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-2">Invoice Details:</h2>
+                                                                    <p class="text-sm text-gray-600 dark:text-gray-400">Invoice #: {{ $invoice->invoice_number }}</p>
+                                                                    <p class="text-sm text-gray-600 dark:text-gray-400">Date: {{ \Carbon\Carbon::parse($invoice->date)->format('M d, Y') }}</p>
+                                                                    <p class="text-sm text-gray-600 dark:text-gray-400">Due Date: {{ \Carbon\Carbon::parse($invoice->due_date)->format('M d, Y') }}</p>
+                                                                    <p class="text-sm text-gray-600 dark:text-gray-400">Status: {{ ucfirst($invoice->status) }}</p>
+                                                                </div>
                                                             </div>
 
                                                             <!-- Time Logs Table -->
@@ -287,22 +304,41 @@
                                                     <!-- Header -->
                                                     <div class="flex justify-between items-start mb-8">
                                                         <div>
-                                                            @if(auth()->user()->logo)
-                                                                <img src="{{ auth()->user()->logo_url }}" alt="Company Logo" class="h-20 w-auto mb-4">
+                                                            @if($invoice->company && $invoice->company->logo)
+                                                                <img src="{{ Storage::url($invoice->company->logo) }}" alt="Company Logo" class="h-20 w-auto mb-4">
                                                             @endif
                                                             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Invoice</h1>
-                                                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ config('app.name') }}</p>
+                                                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ $invoice->company ? $invoice->company->name : config('app.name') }}</p>
                                                         </div>
                                                         <div class="text-right">
                                                             <p class="text-sm text-gray-600 dark:text-gray-400">Date Generated: {{ now()->format('M d, Y') }}</p>
                                                         </div>
                                                     </div>
 
-                                                    <!-- Company and Client Info -->
-                                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
+                                                    <!-- Company, Client, and Invoice Info -->
+                                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
                                                         <div>
                                                             <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-2">From:</h2>
-                                                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ config('app.name') }}</p>
+                                                            @if($invoice->company)
+                                                                <p class="text-sm text-gray-600 dark:text-gray-400">{{ $invoice->company->name }}</p>
+                                                                @if($invoice->company->email)
+                                                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ $invoice->company->email }}</p>
+                                                                @endif
+                                                                @if($invoice->company->phone)
+                                                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ $invoice->company->phone }}</p>
+                                                                @endif
+                                                                @if($invoice->company->address)
+                                                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ $invoice->company->address }}</p>
+                                                                @endif
+                                                                @if($invoice->company->tax_number)
+                                                                    <p class="text-sm text-gray-600 dark:text-gray-400">Tax Number: {{ $invoice->company->tax_number }}</p>
+                                                                @endif
+                                                                @if($invoice->company->registration_number)
+                                                                    <p class="text-sm text-gray-600 dark:text-gray-400">Reg Number: {{ $invoice->company->registration_number }}</p>
+                                                                @endif
+                                                            @else
+                                                                <p class="text-sm text-gray-600 dark:text-gray-400">{{ config('app.name') }}</p>
+                                                            @endif
                                                         </div>
                                                         <div>
                                                             <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-2">To:</h2>
@@ -317,15 +353,13 @@
                                                                 <p class="text-sm text-gray-600 dark:text-gray-400">{{ $invoice->client->address }}</p>
                                                             @endif
                                                         </div>
-                                                    </div>
-
-                                                    <!-- Invoice Details -->
-                                                    <div class="mb-8">
-                                                        <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-2">Invoice Details:</h2>
-                                                        <p class="text-sm text-gray-600 dark:text-gray-400">Invoice #: {{ $invoice->invoice_number }}</p>
-                                                        <p class="text-sm text-gray-600 dark:text-gray-400">Date: {{ \Carbon\Carbon::parse($invoice->date)->format('M d, Y') }}</p>
-                                                        <p class="text-sm text-gray-600 dark:text-gray-400">Due Date: {{ \Carbon\Carbon::parse($invoice->due_date)->format('M d, Y') }}</p>
-                                                        <p class="text-sm text-gray-600 dark:text-gray-400">Status: {{ ucfirst($invoice->status) }}</p>
+                                                        <div>
+                                                            <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-2">Invoice Details:</h2>
+                                                            <p class="text-sm text-gray-600 dark:text-gray-400">Invoice #: {{ $invoice->invoice_number }}</p>
+                                                            <p class="text-sm text-gray-600 dark:text-gray-400">Date: {{ \Carbon\Carbon::parse($invoice->date)->format('M d, Y') }}</p>
+                                                            <p class="text-sm text-gray-600 dark:text-gray-400">Due Date: {{ \Carbon\Carbon::parse($invoice->due_date)->format('M d, Y') }}</p>
+                                                            <p class="text-sm text-gray-600 dark:text-gray-400">Status: {{ ucfirst($invoice->status) }}</p>
+                                                        </div>
                                                     </div>
 
                                                     <!-- Time Logs Table -->
@@ -421,17 +455,27 @@
                                                 {{ $invoiceId ? 'Edit Invoice' : 'Add Invoice' }}
                                             </h3>
                                             <form wire:submit.prevent="save" class="mt-4 space-y-4">
-                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                                     <div>
                                                         <label for="client_id" class="block text-base font-medium text-gray-700 dark:text-gray-300">Client</label>
-                                                        <select wire:model.live="client_id" id="client_id" required
-                                                                class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                            <option value="">Select a client</option>
+                                                        <select wire:model="client_id" id="client_id" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            <option value="">Select Client</option>
                                                             @foreach($clients as $client)
                                                                 <option value="{{ $client->id }}">{{ $client->name }}</option>
                                                             @endforeach
                                                         </select>
-                                                        @error('client_id') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        @error('client_id') <span class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
+                                                    </div>
+
+                                                    <div>
+                                                        <label for="company_id" class="block text-base font-medium text-gray-700 dark:text-gray-300">Company (From)</label>
+                                                        <select wire:model="company_id" id="company_id" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            <option value="">Select Company</option>
+                                                            @foreach($companies as $company)
+                                                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        @error('company_id') <span class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
                                                     </div>
 
                                                     <div>

@@ -1,164 +1,248 @@
-<div class="w-full">
-    <div class="p-4 sm:p-8 bg-gray-50 dark:bg-gray-800 shadow sm:rounded-lg">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ __('Companies') }}</h2>
-            <button wire:click="editCompany" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                {{ __('Add Company') }}
-            </button>
-        </div>
+<div>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <!-- Notification -->
+            <x-notification :message="$notificationMessage" :show="$show" />
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-700">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('Name') }}
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('Address') }}
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('Phone') }}
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('Email') }}
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('Default') }}
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                {{ __('Actions') }}
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        @forelse ($companies as $company)
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {{ $company->name }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $company->address }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $company->phone }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $company->email }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    @if($company->is_default)
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                            {{ __('Yes') }}
-                                        </span>
-                                    @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                            {{ __('No') }}
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <button wire:click="edit({{ $company->id }})" class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 mr-3">
-                                        {{ __('Edit') }}
-                                    </button>
-                                    <button wire:click="delete({{ $company->id }})" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                                        {{ __('Delete') }}
-                                    </button>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                                    {{ __('No companies found.') }}
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-                {{ $companies->links() }}
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">Companies</h2>
+                        <button x-on:click="$dispatch('open-modal')"
+                                class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:bg-indigo-700 dark:focus:bg-indigo-600 active:bg-indigo-900 dark:active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                            {{ __('New Company') }}
+                        </button>
+                    </div>
+
+                    <!-- Companies Table -->
+                    <div class="overflow-x-auto">
+                        <!-- Mobile View -->
+                        <div class="sm:hidden space-y-4">
+                            @forelse($companies as $company)
+                                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ $company->name }}
+                                        </div>
+                                        <div class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                                            {{ $company->email }}
+                                        </div>
+                                    </div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                                        {{ $company->phone }}
+                                    </div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                                        {{ $company->address }}, {{ $company->city }}, {{ $company->state }} {{ $company->zip }}
+                                    </div>
+                                    <div class="flex justify-end space-x-2">
+                                        <div class="flex space-x-2 relative z-[50]">
+                                            <button wire:click="edit({{ $company->id }})"
+                                                    class="p-1 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
+                                                    data-tooltip="Edit">
+                                                <x-icons.edit />
+                                            </button>
+                                            <button wire:click="delete({{ $company->id }})"
+                                                    class="p-1 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
+                                                    data-tooltip="Delete"
+                                                    onclick="return confirm('Are you sure you want to delete this company?')">
+                                                <x-icons.trash />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center text-gray-500 dark:text-gray-400 py-4">
+                                    No companies found. Click "New Company" to create one.
+                                </div>
+                            @endforelse
+                        </div>
+
+                        <!-- Desktop View -->
+                        <div class="hidden sm:block">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-800">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Name</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Phone</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Address</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                    @forelse($companies as $company)
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $company->name }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{{ $company->email }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{{ $company->phone }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                            {{ $company->address }}, {{ $company->city }}, {{ $company->state }} {{ $company->zip }}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-right space-x-2">
+                                            <div class="flex items-center justify-end space-x-2">
+                                                <div class="flex space-x-2 relative z-[50]">
+                                                    <button wire:click="edit({{ $company->id }})"
+                                                            class="p-1 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
+                                                            data-tooltip="Edit">
+                                                        <x-icons.edit />
+                                                    </button>
+                                                    <button wire:click="delete({{ $company->id }})"
+                                                            class="p-1 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
+                                                            data-tooltip="Delete"
+                                                            onclick="return confirm('Are you sure you want to delete this company?')">
+                                                        <x-icons.trash />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                            No companies found. Click "New Company" to create one.
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        {{ $companies->links() }}
+                    </div>
+
+                    <!-- New Company Modal -->
+                    <div x-data="{ show: false }"
+                         x-cloak
+                         x-show="show"
+                         x-on:open-modal.window="show = true"
+                         x-on:keydown.escape.window="show = false"
+                         x-on:close-modal.window="show = false"
+                         class="fixed inset-0 z-[100]">
+                        
+                        <!-- Backdrop -->
+                        <div x-show="show"
+                             x-transition.opacity.duration.300ms
+                             class="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-75"
+                             @click="show = false">
+                        </div>
+
+                        <!-- Modal Panel -->
+                        <div class="fixed inset-0 z-[101] pointer-events-none">
+                            <div class="flex items-center justify-center min-h-screen p-4">
+                                <div x-show="show"
+                                     x-transition:enter="ease-out duration-300"
+                                     x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                                     x-transition:leave="ease-in duration-200"
+                                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                     class="relative bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-2xl w-full max-h-[90vh] overflow-y-auto pointer-events-auto"
+                                     @click.away="show = false">
+                                    
+                                    <div class="bg-white dark:bg-gray-800 px-6 py-6">
+                                        <div class="mt-3">
+                                            <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
+                                                {{ $companyId ? 'Edit Company' : 'Add Company' }}
+                                            </h3>
+                                            <form wire:submit.prevent="save" class="mt-4 space-y-4">
+                                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                                    <div>
+                                                        <label for="name" class="block text-base font-medium text-gray-700 dark:text-gray-300">Company Name</label>
+                                                        <input type="text" wire:model="name" id="name" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                        @error('name') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                    </div>
+                                                    <div>
+                                                        <label for="email" class="block text-base font-medium text-gray-700 dark:text-gray-300">Email</label>
+                                                        <input type="email" wire:model="email" id="email" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                        @error('email') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                    </div>
+                                                    <div>
+                                                        <label for="phone" class="block text-base font-medium text-gray-700 dark:text-gray-300">Phone</label>
+                                                        <input type="text" wire:model="phone" id="phone" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                        @error('phone') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                    </div>
+                                                    <div>
+                                                        <label for="website" class="block text-base font-medium text-gray-700 dark:text-gray-300">Website</label>
+                                                        <input type="url" wire:model="website" id="website" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                        @error('website') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                    </div>
+                                                </div>
+
+                                                <div class="mt-4">
+                                                    <label for="address" class="block text-base font-medium text-gray-700 dark:text-gray-300">Address</label>
+                                                    <textarea wire:model="address" id="address" rows="3" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3"></textarea>
+                                                    @error('address') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                </div>
+
+                                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-4">
+                                                    <div>
+                                                        <label for="tax_number" class="block text-base font-medium text-gray-700 dark:text-gray-300">Tax Number</label>
+                                                        <input type="text" wire:model="tax_number" id="tax_number" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                        @error('tax_number') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                    </div>
+                                                    <div>
+                                                        <label for="registration_number" class="block text-base font-medium text-gray-700 dark:text-gray-300">Registration Number</label>
+                                                        <input type="text" wire:model="registration_number" id="registration_number" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                        @error('registration_number') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                    </div>
+                                                </div>
+
+                                                <div class="mt-4">
+                                                    <label for="logo" class="block text-base font-medium text-gray-700 dark:text-gray-300">Logo</label>
+                                                    <div class="mt-2 space-y-4">
+                                                        @if($companyId && !($logo instanceof \Illuminate\Http\UploadedFile) && $logo)
+                                                            <div class="flex items-center space-x-4">
+                                                                <div class="h-16 w-16 rounded bg-gray-50 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                                                                    <img src="{{ asset('storage/' . $logo) }}" alt="Company logo" class="h-full w-full object-cover">
+                                                                </div>
+                                                                <label class="flex items-center">
+                                                                    <input type="checkbox" wire:model="removeLogo" class="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50">
+                                                                    <span class="ml-2 text-sm text-red-600 dark:text-red-400">Remove logo</span>
+                                                                </label>
+                                                            </div>
+                                                        @endif
+                                                        @if($logo instanceof \Illuminate\Http\UploadedFile)
+                                                            <div class="flex items-center">
+                                                                <div class="h-16 w-16 rounded bg-gray-50 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                                                                    <img src="{{ $logo->temporaryUrl() }}" alt="New logo preview" class="h-full w-full object-cover">
+                                                                </div>
+                                                                <span class="ml-4 text-sm text-gray-500 dark:text-gray-400">New logo preview</span>
+                                                            </div>
+                                                        @endif
+                                                        <input type="file" wire:model="logo" id="logo" accept="image/*" class="block w-full text-base text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-base file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900 dark:file:text-indigo-100">
+                                                        @error('logo') <span class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
+                                                    </div>
+                                                </div>
+
+                                                <div class="mt-4">
+                                                    <label class="flex items-center">
+                                                        <input type="checkbox" wire:model="is_default" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Set as default company</span>
+                                                    </label>
+                                                </div>
+
+                                                <div class="mt-6 flex justify-end space-x-4 sticky bottom-0 bg-white dark:bg-gray-800 py-4">
+                                                    <button type="button" 
+                                                            @click="show = false"
+                                                            class="inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-3 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                                        Cancel
+                                                    </button>
+                                                    <button type="submit" 
+                                                            class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                                        {{ $companyId ? 'Update' : 'Create' }}
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-    <x-modal wire:model="showModal">
-        <div class="p-6">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
-                {{ $editingId ? __('Edit Company') : __('Add Company') }}
-            </h3>
-
-            <form wire:submit="save">
-                <div class="space-y-4">
-                    <div>
-                        <x-label for="name" :value="__('Name')" />
-                        <x-input wire:model="companyForm.name" id="name" type="text" class="mt-1 block w-full" required />
-                        @error('companyForm.name') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div>
-                        <x-label for="address" :value="__('Address')" />
-                        <x-textarea wire:model="companyForm.address" id="address" class="mt-1 block w-full" />
-                        @error('companyForm.address') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div>
-                        <x-label for="phone" :value="__('Phone')" />
-                        <x-input wire:model="companyForm.phone" id="phone" type="text" class="mt-1 block w-full" />
-                        @error('companyForm.phone') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div>
-                        <x-label for="email" :value="__('Email')" />
-                        <x-input wire:model="companyForm.email" id="email" type="email" class="mt-1 block w-full" />
-                        @error('companyForm.email') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div>
-                        <x-label for="website" :value="__('Website')" />
-                        <x-input wire:model="companyForm.website" id="website" type="url" class="mt-1 block w-full" />
-                        @error('companyForm.website') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div>
-                        <x-label for="tax_number" :value="__('Tax Number')" />
-                        <x-input wire:model="companyForm.tax_number" id="tax_number" type="text" class="mt-1 block w-full" />
-                        @error('companyForm.tax_number') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div>
-                        <x-label for="registration_number" :value="__('Registration Number')" />
-                        <x-input wire:model="companyForm.registration_number" id="registration_number" type="text" class="mt-1 block w-full" />
-                        @error('companyForm.registration_number') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div>
-                        <x-label for="logo" :value="__('Logo')" />
-                        <x-input wire:model="companyForm.logo" id="logo" type="file" class="mt-1 block w-full" accept="image/*" />
-                        @error('companyForm.logo') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div>
-                        <label class="flex items-center">
-                            <x-checkbox wire:model="companyForm.is_default" />
-                            <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Set as default company') }}</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="mt-6 flex justify-end">
-                    <button type="button" 
-                            wire:click="$set('showModal', false)"
-                            class="inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-3 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mr-3">
-                        {{ __('Cancel') }}
-                    </button>
-                    <button type="submit" 
-                            class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        {{ $editingId ? __('Update') : __('Create') }}
-                    </button>
-                </div>
-            </form>
-        </div>
-    </x-modal>
 </div> 

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Traits\WithNotifications;
 use App\Models\Client;
+use App\Models\Company;
 
 class Invoices extends Component
 {
@@ -28,6 +29,8 @@ class Invoices extends Component
     public $invoiceId = null;
     public $clients = [];
     public $client_id = '';
+    public $companies = [];
+    public $company_id = '';
     public $date = '';
     public $due_date = '';
     public $status = 'draft';
@@ -42,6 +45,7 @@ class Invoices extends Component
         $this->sort = request('sort', 'desc');
         $this->previewId = request('preview');
         $this->clients = \App\Models\Client::where('user_id', auth()->id())->get();
+        $this->companies = \App\Models\Company::where('user_id', auth()->id())->get();
         $this->date = now()->format('Y-m-d');
         $this->due_date = now()->addDays(30)->format('Y-m-d');
         $this->loadAvailableTimeLogs();
@@ -63,7 +67,7 @@ class Invoices extends Component
 
     public function create()
     {
-        $this->reset(['invoiceId', 'client_id', 'date', 'due_date', 'status', 'notes', 'selectedTimeLogs']);
+        $this->reset(['invoiceId', 'client_id', 'company_id', 'date', 'due_date', 'status', 'notes', 'selectedTimeLogs']);
         $this->loadAvailableTimeLogs();
         $this->dispatch('open-modal');
     }
@@ -73,6 +77,7 @@ class Invoices extends Component
         $invoice = Invoice::findOrFail($id);
         $this->invoiceId = $invoice->id;
         $this->client_id = $invoice->client_id;
+        $this->company_id = $invoice->company_id;
         $this->date = $invoice->date->format('Y-m-d');
         $this->due_date = $invoice->due_date->format('Y-m-d');
         $this->status = $invoice->status;
@@ -86,6 +91,7 @@ class Invoices extends Component
     {
         $this->validate([
             'client_id' => 'required|exists:clients,id',
+            'company_id' => 'required|exists:companies,id',
             'date' => 'required|date',
             'due_date' => 'required|date|after_or_equal:date',
             'status' => 'required|in:draft,sent,paid,overdue',
@@ -104,6 +110,7 @@ class Invoices extends Component
             
             $invoice->update([
                 'client_id' => $this->client_id,
+                'company_id' => $this->company_id,
                 'date' => $this->date,
                 'due_date' => $this->due_date,
                 'status' => $this->status,
@@ -115,6 +122,7 @@ class Invoices extends Component
             $invoice = Invoice::create([
                 'user_id' => auth()->id(),
                 'client_id' => $this->client_id,
+                'company_id' => $this->company_id,
                 'date' => $this->date,
                 'due_date' => $this->due_date,
                 'status' => $this->status,
@@ -127,7 +135,7 @@ class Invoices extends Component
         // Update time logs with invoice_id
         TimeLog::whereIn('id', $this->selectedTimeLogs)->update(['invoice_id' => $invoice->id]);
 
-        $this->reset(['invoiceId', 'client_id', 'date', 'due_date', 'status', 'notes', 'selectedTimeLogs']);
+        $this->reset(['invoiceId', 'client_id', 'company_id', 'date', 'due_date', 'status', 'notes', 'selectedTimeLogs']);
         $this->loadAvailableTimeLogs();
         $this->dispatch('close-modal');
         $this->showNotification('Invoice ' . ($this->invoiceId ? 'updated' : 'created') . ' successfully!');
@@ -207,6 +215,9 @@ class Invoices extends Component
             'invoices' => $invoices,
             'availableTimeLogs' => $availableTimeLogs,
             'clients' => Client::where('user_id', auth()->id())
+                ->orderBy('name')
+                ->get(),
+            'companies' => Company::where('user_id', auth()->id())
                 ->orderBy('name')
                 ->get(),
         ]);
