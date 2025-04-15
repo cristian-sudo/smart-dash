@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="light">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -34,14 +34,10 @@
                 offset: 50
             });
         });
-
-        // Check for saved theme preference or use system preference
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark')
-        } else {
-            document.documentElement.classList.remove('dark')
-        }
     </script>
+
+    <!-- Theme Management -->
+    <x-theme-script />
 
     <style>
         [x-cloak] { display: none !important; }
@@ -141,36 +137,44 @@
         const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
         const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 
-        // Change the icons inside the button based on previous settings
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            themeToggleLightIcon.classList.remove('hidden');
-        } else {
-            themeToggleDarkIcon.classList.remove('hidden');
+        // Change the icons inside the button based on current theme
+        function updateThemeIcon() {
+            const fluxTheme = localStorage.getItem('flux_appearance') || 'system';
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = fluxTheme === 'dark' || (fluxTheme === 'system' && prefersDark);
+
+            themeToggleDarkIcon.classList.toggle('hidden', isDark);
+            themeToggleLightIcon.classList.toggle('hidden', !isDark);
         }
 
-        themeToggleBtn.addEventListener('click', function() {
-            // Toggle icons
-            themeToggleDarkIcon.classList.toggle('hidden');
-            themeToggleLightIcon.classList.toggle('hidden');
+        // Initial icon state
+        updateThemeIcon();
 
-            // If is set in localStorage
-            if (localStorage.getItem('theme')) {
-                if (localStorage.getItem('theme') === 'light') {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('theme', 'light');
-                }
-            } else {
-                if (document.documentElement.classList.contains('dark')) {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('theme', 'light');
-                } else {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('theme', 'dark');
-                }
+        // Watch for system theme changes to update icon
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateThemeIcon);
+
+        themeToggleBtn.addEventListener('click', function() {
+            const currentTheme = localStorage.getItem('flux_appearance') || 'system';
+            let newTheme;
+
+            // Cycle through themes: system -> light -> dark -> system
+            switch (currentTheme) {
+                case 'system':
+                    newTheme = 'light';
+                    break;
+                case 'light':
+                    newTheme = 'dark';
+                    break;
+                case 'dark':
+                    newTheme = 'system';
+                    break;
+                default:
+                    newTheme = 'system';
             }
+
+            localStorage.setItem('flux_appearance', newTheme);
+            updateThemeIcon();
+            initializeTheme(); // This function is available from theme-script.blade.php
         });
     </script>
 </body>
