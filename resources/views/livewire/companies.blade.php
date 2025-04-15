@@ -187,6 +187,17 @@
                                                         <input type="text" wire:model="registration_number" id="registration_number" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
                                                         @error('registration_number') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
                                                     </div>
+                                                    <div>
+                                                        <label for="color" class="block text-base font-medium text-gray-700 dark:text-gray-300">Company Color</label>
+                                                        <div class="mt-2 flex items-center space-x-2">
+                                                            <input type="color" wire:model="color" id="color"
+                                                                   class="h-10 w-20 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300">
+                                                            <input type="text" wire:model="color" id="color_text"
+                                                                   class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 sm:text-sm"
+                                                                   placeholder="#3B82F6">
+                                                        </div>
+                                                        @error('color') <span class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
+                                                    </div>
                                                 </div>
 
                                                 <div class="mt-4">

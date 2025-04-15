@@ -21,6 +21,7 @@ class Company extends Model
         'registration_number',
         'logo',
         'is_default',
+        'color',
     ];
 
     public function user(): BelongsTo

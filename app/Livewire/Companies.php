@@ -25,6 +25,9 @@ class Companies extends Component
     public $tax_number = '';
     public $registration_number = '';
     public $logo = null;
+    public $color = '#3B82F6';
+    public $editingId = null;
+    public $showModal = false;
     public $is_default = false;
     public $removeLogo = false;
 
@@ -73,6 +76,7 @@ class Companies extends Component
         $this->tax_number = $company->tax_number;
         $this->registration_number = $company->registration_number;
         $this->logo = $company->logo;
+        $this->color = $company->color;
         $this->is_default = $company->is_default;
         $this->removeLogo = false;
         $this->dispatch('open-modal');
@@ -89,6 +93,7 @@ class Companies extends Component
             'tax_number' => 'nullable|string|max:255',
             'registration_number' => 'nullable|string|max:255',
             'is_default' => 'boolean',
+            'color' => 'required|string|max:7',
         ];
 
         // Only validate logo as image if it's a new upload
@@ -101,6 +106,7 @@ class Companies extends Component
         $validated = $this->validate($rules);
 
         $validated['user_id'] = auth()->id();
+        $validated['color'] = $this->color;
 
         if ($this->companyId) {
             $company = Company::find($this->companyId);

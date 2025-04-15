@@ -171,36 +171,36 @@
                                                     </div>
 
                                                     <div>
-                                                        <label for="address" class="block text-base font-medium text-gray-700 dark:text-gray-300">Address</label>
-                                                        <input type="text" wire:model.live="address" id="address"
+                                                        <label for="address" class="block text-base font-medium text-gray-700 dark:text-gray-300">Address <span class="text-red-500">*</span></label>
+                                                        <input type="text" wire:model.live="address" id="address" required
                                                                class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
                                                         @error('address') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
                                                     </div>
 
                                                     <div>
-                                                        <label for="city" class="block text-base font-medium text-gray-700 dark:text-gray-300">City</label>
-                                                        <input type="text" wire:model.live="city" id="city"
+                                                        <label for="city" class="block text-base font-medium text-gray-700 dark:text-gray-300">City <span class="text-red-500">*</span></label>
+                                                        <input type="text" wire:model.live="city" id="city" required
                                                                class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
                                                         @error('city') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
                                                     </div>
 
                                                     <div>
-                                                        <label for="state" class="block text-base font-medium text-gray-700 dark:text-gray-300">State</label>
-                                                        <input type="text" wire:model.live="state" id="state"
+                                                        <label for="county" class="block text-base font-medium text-gray-700 dark:text-gray-300">County/State <span class="text-red-500">*</span></label>
+                                                        <input type="text" wire:model.live="state" id="county" required
                                                                class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
                                                         @error('state') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
                                                     </div>
 
                                                     <div>
-                                                        <label for="zip" class="block text-base font-medium text-gray-700 dark:text-gray-300">ZIP</label>
-                                                        <input type="text" wire:model.live="zip" id="zip"
+                                                        <label for="postcode" class="block text-base font-medium text-gray-700 dark:text-gray-300">Postcode/ZIP <span class="text-red-500">*</span></label>
+                                                        <input type="text" wire:model.live="zip" id="postcode" required
                                                                class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
                                                         @error('zip') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
                                                     </div>
 
                                                     <div>
-                                                        <label for="country" class="block text-base font-medium text-gray-700 dark:text-gray-300">Country</label>
-                                                        <input type="text" wire:model.live="country" id="country"
+                                                        <label for="country" class="block text-base font-medium text-gray-700 dark:text-gray-300">Country <span class="text-red-500">*</span></label>
+                                                        <input type="text" wire:model.live="country" id="country" required
                                                                class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
                                                         @error('country') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
                                                     </div>

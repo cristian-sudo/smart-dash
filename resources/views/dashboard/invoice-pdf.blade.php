@@ -116,6 +116,9 @@
 </head>
 <body>
     <div class="container">
+        @if($invoice->company && $invoice->company->color)
+            <div style="height: 24px; width: 100%; background-color: {{ $invoice->company->color }}; margin-bottom: 2rem;"></div>
+        @endif
         <!-- Header -->
         <div class="header">
             <div class="header-left">
