@@ -52,9 +52,6 @@
                             <a href="#how-it-works" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition duration-150 ease-in-out">
                                 How It Works
                             </a>
-                            <a href="#testimonials" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition duration-150 ease-in-out">
-                                Testimonials
-                            </a>
                             <a href="#pricing" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition duration-150 ease-in-out">
                                 Pricing
                             </a>

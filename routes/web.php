@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use App\Models\Service;
 use App\Models\Invoice;
 use App\Livewire\Services;
+use App\Http\Controllers\ContactController;
 
 // Public routes
 Route::get('/', function () {
