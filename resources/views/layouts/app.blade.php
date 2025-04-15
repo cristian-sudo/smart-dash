@@ -54,27 +54,28 @@
                 <div class="flex justify-between h-16">
                     <div class="flex">
                         <!-- Logo -->
-                        <div class="flex-shrink-0 flex items-center">
-                            <a href="{{ url('/') }}" class="text-xl font-bold text-gray-800 dark:text-white">
-                                {{ config('app.name', 'Smart Dash') }}
+                        <div class="flex-shrink-0 flex items-center space-x-2">
+                            <a href="{{ url('/') }}" class="flex items-center">
+                                <img src="{{ asset('images/logo.svg') }}" alt="Smart Dash Logo" class="h-12 w-auto">
+                                <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white">Smart-dash</span>
                             </a>
                         </div>
 
                         <!-- Navigation Links -->
                         <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                            <a href="#hero" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition duration-150 ease-in-out">
+                            <a href="#hero" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-green-400 dark:hover:text-green-400 transition duration-300 ease-in-out transform hover:scale-105">
                                 Home
                             </a>
-                            <a href="#features" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition duration-150 ease-in-out">
+                            <a href="#features" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-green-400 dark:hover:text-green-400 transition duration-300 ease-in-out transform hover:scale-105">
                                 Features
                             </a>
-                            <a href="#how-it-works" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition duration-150 ease-in-out">
+                            <a href="#how-it-works" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-green-400 dark:hover:text-green-400 transition duration-300 ease-in-out transform hover:scale-105">
                                 How It Works
                             </a>
-                            <a href="#pricing" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition duration-150 ease-in-out">
+                            <a href="#pricing" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-green-400 dark:hover:text-green-400 transition duration-300 ease-in-out transform hover:scale-105">
                                 Pricing
                             </a>
-                            <a href="#contact" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition duration-150 ease-in-out">
+                            <a href="#contact" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-green-400 dark:hover:text-green-400 transition duration-300 ease-in-out transform hover:scale-105">
                                 Contact
                             </a>
                         </div>
@@ -95,15 +96,15 @@
                         <!-- Auth Buttons -->
                         <div class="hidden sm:flex sm:items-center sm:ml-6 space-x-4">
                             @guest
-                                <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-indigo-900 dark:text-indigo-200 dark:hover:bg-indigo-800">
+                                <a href="{{ route('login') }}" class="inline-block px-5 py-1.5 text-white bg-green-600 hover:bg-green-700 rounded-md text-sm leading-normal transition-all duration-300 hover:scale-105">
                                     Log in
                                 </a>
-                                <a href="{{ route('register') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <a href="{{ route('register') }}" class="inline-block px-5 py-1.5 text-white bg-green-600 hover:bg-green-700 rounded-md text-sm leading-normal transition-all duration-300 hover:scale-105">
                                     Register
                                 </a>
                             @endguest
                             @auth
-                                <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <a href="{{ route('dashboard') }}" class="inline-block px-5 py-1.5 text-white bg-green-600 hover:bg-green-700 rounded-md text-sm leading-normal transition-all duration-300 hover:scale-105">
                                     Dashboard
                                 </a>
                             @endauth
@@ -117,6 +118,9 @@
         <main>
             @yield('content')
         </main>
+        
+        <!-- Footer -->
+        <x-footer />
     </div>
 
     <script>

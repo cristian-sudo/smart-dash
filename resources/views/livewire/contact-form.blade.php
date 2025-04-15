@@ -39,7 +39,7 @@
 
             <div class="pt-4">
                 <button type="submit" 
-                        class="w-full flex justify-center py-4 px-6 inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-green-600 bg-white hover:bg-green-50 transition-all duration-300 hover:scale-105">
+                        class="w-full flex justify-center py-4 px-6 inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-all duration-300 hover:scale-105">
                         Send Message
                 </button>
             </div>

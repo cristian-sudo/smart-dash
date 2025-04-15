@@ -118,6 +118,9 @@
         </flux:sidebar>
 
         {{ $slot }}
+        
+        <!-- Footer -->
+        <x-footer />
 
         @fluxScripts
     </body>
