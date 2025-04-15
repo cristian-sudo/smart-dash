@@ -17,9 +17,9 @@
                     <!-- Clients Table -->
                     <div class="overflow-x-auto">
                         <!-- Mobile View -->
-                        <div class="sm:hidden space-y-4">
+                        <div class="md:hidden space-y-6">
                             @forelse($clients as $client)
-                                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border border-gray-200 dark:border-gray-700">
                                     <div class="flex justify-between items-start mb-2">
                                         <div class="text-sm font-medium text-gray-900 dark:text-white">
                                             {{ $client->name }}

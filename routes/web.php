@@ -23,7 +23,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/time-logs', [TimeLogController::class, 'index'])->name('time-logs.index');
-    Route::get('/services', Services::class)->name('services.index');
 
     Route::prefix('dashboard')->group(function () {
         // Time Logs Route
@@ -36,6 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/invoices/{invoice}/download', [Invoices::class, 'download'])->name('invoices.download');
 
         // Services Routes
+        Route::get('/services', Services::class)->name('services.index');
         Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
         Route::put('/services/{service}', [ServiceController::class, 'update'])->name('services.update');
         Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');

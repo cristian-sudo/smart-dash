@@ -37,6 +37,8 @@ class Invoices extends Component
     public $notes = '';
     public $availableTimeLogs = [];
     public $showNotification = false;
+    public $currentTimeLogs = [];
+    public $timeLogsToRemove = [];
 
     protected $listeners = ['refreshInvoices' => '$refresh'];
 
@@ -53,9 +55,8 @@ class Invoices extends Component
 
     public function loadAvailableTimeLogs()
     {
-        $this->availableTimeLogs = TimeLog::where('user_id', auth()->id())
-            ->whereNull('invoice_id')
-            ->orderBy('date', 'desc')
+        $this->availableTimeLogs = TimeLog::where('invoice_id', null)
+            ->orWhere('invoice_id', $this->invoiceId)
             ->get();
     }
 
@@ -68,76 +69,91 @@ class Invoices extends Component
     public function create()
     {
         $this->reset(['invoiceId', 'client_id', 'company_id', 'date', 'due_date', 'status', 'notes', 'selectedTimeLogs']);
+        $this->currentTimeLogs = collect([]);
         $this->loadAvailableTimeLogs();
-        $this->dispatch('open-modal');
+        $this->showModal = true;
     }
 
     public function edit($id)
     {
-        $invoice = Invoice::findOrFail($id);
-        $this->invoiceId = $invoice->id;
+        $this->invoiceId = $id;
+        $invoice = Invoice::find($id);
+        
         $this->client_id = $invoice->client_id;
         $this->company_id = $invoice->company_id;
         $this->date = $invoice->date->format('Y-m-d');
         $this->due_date = $invoice->due_date->format('Y-m-d');
         $this->status = $invoice->status;
         $this->notes = $invoice->notes;
+        
+        // Load current time logs
+        $this->currentTimeLogs = $invoice->timeLogs;
         $this->selectedTimeLogs = $invoice->timeLogs->pluck('id')->toArray();
+        
         $this->loadAvailableTimeLogs();
-        $this->dispatch('open-modal');
+        $this->showModal = true;
+    }
+
+    public function closeModal()
+    {
+        $this->showModal = false;
+    }
+
+    public function removeTimeLog($timeLogId)
+    {
+        $this->timeLogsToRemove[] = $timeLogId;
+        $this->selectedTimeLogs = array_filter($this->selectedTimeLogs, function($id) use ($timeLogId) {
+            return $id != $timeLogId;
+        });
     }
 
     public function save()
     {
         $this->validate([
-            'client_id' => 'required|exists:clients,id',
-            'company_id' => 'required|exists:companies,id',
+            'client_id' => 'required',
+            'company_id' => 'required',
             'date' => 'required|date',
             'due_date' => 'required|date|after_or_equal:date',
-            'status' => 'required|in:draft,sent,paid,overdue',
+            'status' => 'required',
             'selectedTimeLogs' => 'required|array|min:1',
-            'selectedTimeLogs.*' => 'exists:time_logs,id',
         ]);
 
-        $totalHours = TimeLog::whereIn('id', $this->selectedTimeLogs)->sum('hours');
-        $totalAmount = $totalHours * 100; // Assuming $100 per hour
+        $data = [
+            'user_id' => auth()->id(),
+            'client_id' => $this->client_id,
+            'company_id' => $this->company_id,
+            'date' => $this->date,
+            'due_date' => $this->due_date,
+            'status' => $this->status,
+            'notes' => $this->notes,
+        ];
+
+        // Calculate total hours and total amount
+        $timeLogs = TimeLog::whereIn('id', $this->selectedTimeLogs)->with('service')->get();
+        $totalHours = $timeLogs->sum('hours');
+        $totalAmount = $timeLogs->sum(function ($log) {
+            return $log->service->calculatePriceForHours($log->hours);
+        });
+
+        $data['total_hours'] = $totalHours;
+        $data['total'] = $totalAmount;
 
         if ($this->invoiceId) {
-            $invoice = Invoice::findOrFail($this->invoiceId);
+            $invoice = Invoice::find($this->invoiceId);
+            $invoice->update($data);
             
-            // Remove invoice_id from previously associated time logs
+            // First, remove all time logs from this invoice
             TimeLog::where('invoice_id', $invoice->id)->update(['invoice_id' => null]);
             
-            $invoice->update([
-                'client_id' => $this->client_id,
-                'company_id' => $this->company_id,
-                'date' => $this->date,
-                'due_date' => $this->due_date,
-                'status' => $this->status,
-                'notes' => $this->notes,
-                'total_hours' => $totalHours,
-                'total' => $totalAmount,
-            ]);
+            // Then, add the newly selected time logs
+            TimeLog::whereIn('id', $this->selectedTimeLogs)->update(['invoice_id' => $invoice->id]);
         } else {
-            $invoice = Invoice::create([
-                'user_id' => auth()->id(),
-                'client_id' => $this->client_id,
-                'company_id' => $this->company_id,
-                'date' => $this->date,
-                'due_date' => $this->due_date,
-                'status' => $this->status,
-                'notes' => $this->notes,
-                'total_hours' => $totalHours,
-                'total' => $totalAmount,
-            ]);
+            $invoice = Invoice::create($data);
+            TimeLog::whereIn('id', $this->selectedTimeLogs)->update(['invoice_id' => $invoice->id]);
         }
 
-        // Update time logs with invoice_id
-        TimeLog::whereIn('id', $this->selectedTimeLogs)->update(['invoice_id' => $invoice->id]);
-
-        $this->reset(['invoiceId', 'client_id', 'company_id', 'date', 'due_date', 'status', 'notes', 'selectedTimeLogs']);
+        $this->reset(['showModal', 'invoiceId', 'client_id', 'company_id', 'date', 'due_date', 'status', 'notes', 'selectedTimeLogs', 'timeLogsToRemove']);
         $this->loadAvailableTimeLogs();
-        $this->dispatch('close-modal');
         $this->showNotification('Invoice ' . ($this->invoiceId ? 'updated' : 'created') . ' successfully!');
     }
 

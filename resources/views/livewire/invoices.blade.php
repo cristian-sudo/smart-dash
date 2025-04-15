@@ -64,29 +64,29 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <div class="flex justify-end space-x-4">
                                                     <button wire:click="edit({{ $invoice->id }})"
-                                                            class="p-2 text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-900"
+                                                            class="p-2 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                                                             data-tooltip="Edit">
                                                         <x-icons.edit class="w-5 h-5" />
                                                     </button>
                                                     <button wire:click="togglePreview({{ $invoice->id }})"
-                                                            class="p-2 text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-900"
+                                                            class="p-2 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                                                             data-tooltip="Preview">
                                                         <x-icons.eye class="w-5 h-5" />
                                                     </button>
                                                     <a href="{{ route('invoices.download', $invoice) }}"
-                                                       class="p-2 text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-900"
+                                                       class="p-2 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                                                        data-tooltip="Download">
                                                         <x-icons.download class="w-5 h-5" />
                                                     </a>
                                                     @if($invoice->status !== 'paid')
                                                         <button wire:click="markAsPaid({{ $invoice->id }})"
-                                                                class="p-2 text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 rounded-full hover:bg-green-50 dark:hover:bg-green-900"
+                                                                class="p-2 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                                                                 data-tooltip="Mark as Paid">
                                                             <x-icons.check class="w-5 h-5" />
                                                         </button>
                                                     @endif
                                                     <button wire:click="delete({{ $invoice->id }})"
-                                                            class="p-2 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 rounded-full hover:bg-red-50 dark:hover:bg-red-900"
+                                                            class="p-2 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                                                             data-tooltip="Delete"
                                                             onclick="return confirm('Are you sure you want to delete this invoice?')">
                                                         <x-icons.trash class="w-5 h-5" />
@@ -220,7 +220,7 @@
                         <!-- Mobile Cards -->
                         <div class="md:hidden space-y-4">
                             @forelse($invoices as $invoice)
-                                <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+                                <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg border border-gray-200 dark:border-gray-700">
                                     <div class="p-4">
                                         <div class="flex justify-between items-start">
                                             <div>
@@ -269,29 +269,29 @@
 
                                         <div class="mt-4 flex justify-end space-x-2">
                                             <button wire:click="edit({{ $invoice->id }})"
-                                                    class="p-2 text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-900"
+                                                    class="p-2 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                                                     data-tooltip="Edit">
                                                 <x-icons.edit class="w-5 h-5" />
                                             </button>
                                             <button wire:click="togglePreview({{ $invoice->id }})"
-                                                    class="p-2 text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-900"
+                                                    class="p-2 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                                                     data-tooltip="Preview">
                                                 <x-icons.eye class="w-5 h-5" />
                                             </button>
                                             <a href="{{ route('invoices.download', $invoice) }}"
-                                               class="p-2 text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 rounded-full hover:bg-indigo-50 dark:hover:bg-indigo-900"
+                                               class="p-2 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                                                data-tooltip="Download">
                                                 <x-icons.download class="w-5 h-5" />
                                             </a>
                                             @if($invoice->status !== 'paid')
                                                 <button wire:click="markAsPaid({{ $invoice->id }})"
-                                                        class="p-2 text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 rounded-full hover:bg-green-50 dark:hover:bg-green-900"
+                                                        class="p-2 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                                                         data-tooltip="Mark as Paid">
                                                     <x-icons.check class="w-5 h-5" />
                                                 </button>
                                             @endif
                                             <button wire:click="delete({{ $invoice->id }})"
-                                                    class="p-2 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 rounded-full hover:bg-red-50 dark:hover:bg-red-900"
+                                                    class="p-2 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                                                     data-tooltip="Delete"
                                                     onclick="return confirm('Are you sure you want to delete this invoice?')">
                                                 <x-icons.trash class="w-5 h-5" />
@@ -421,144 +421,166 @@
                     </div>
 
                     <!-- Modal -->
-                    <div x-data="{ show: false }"
-                         x-cloak
-                         x-show="show"
-                         x-on:open-modal.window="show = true"
-                         x-on:keydown.escape.window="show = false"
-                         x-on:close-modal.window="show = false"
-                         class="fixed inset-0 z-[100]">
-                        
-                        <!-- Backdrop -->
-                        <div x-show="show"
-                             x-transition.opacity.duration.300ms
-                             class="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-75"
-                             @click="show = false">
-                        </div>
+                    @if($showModal)
+                        <div class="fixed inset-0 z-[100]">
+                            <!-- Backdrop -->
+                            <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-75" wire:click="closeModal"></div>
 
-                        <!-- Modal Panel -->
-                        <div class="fixed inset-0 z-[101] pointer-events-none">
-                            <div class="flex items-center justify-center min-h-screen p-4">
-                                <div x-show="show"
-                                     x-transition:enter="ease-out duration-300"
-                                     x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                                     x-transition:leave="ease-in duration-200"
-                                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                                     class="relative bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-2xl w-full max-h-[90vh] overflow-y-auto pointer-events-auto"
-                                     @click.away="show = false">
-                                    
-                                    <div class="bg-white dark:bg-gray-800 px-6 py-6">
-                                        <div class="mt-3">
-                                            <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
-                                                {{ $invoiceId ? 'Edit Invoice' : 'Add Invoice' }}
-                                            </h3>
-                                            <form wire:submit.prevent="save" class="mt-4 space-y-4">
-                                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                                    <div>
-                                                        <label for="client_id" class="block text-base font-medium text-gray-700 dark:text-gray-300">Client</label>
-                                                        <select wire:model="client_id" id="client_id" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                            <option value="">Select Client</option>
-                                                            @foreach($clients as $client)
-                                                                <option value="{{ $client->id }}">{{ $client->name }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                        @error('client_id') <span class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
+                            <!-- Modal Panel -->
+                            <div class="fixed inset-0 z-[101] pointer-events-none">
+                                <div class="flex items-center justify-center min-h-screen p-4">
+                                    <div class="relative bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-2xl w-full max-h-[90vh] overflow-y-auto pointer-events-auto">
+                                        <div class="bg-white dark:bg-gray-800 px-6 py-6">
+                                            <div class="mt-3">
+                                                <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
+                                                    {{ $invoiceId ? 'Edit Invoice' : 'Add Invoice' }}
+                                                </h3>
+                                                <form wire:submit.prevent="save" class="mt-4 space-y-4">
+                                                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                                        <div>
+                                                            <label for="client_id" class="block text-base font-medium text-gray-700 dark:text-gray-300">Client</label>
+                                                            <select wire:model="client_id" id="client_id" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                                <option value="">Select Client</option>
+                                                                @foreach($clients as $client)
+                                                                    <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                            @error('client_id') <span class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
+                                                        </div>
+
+                                                        <div>
+                                                            <label for="company_id" class="block text-base font-medium text-gray-700 dark:text-gray-300">Company (From)</label>
+                                                            <select wire:model="company_id" id="company_id" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                                <option value="">Select Company</option>
+                                                                @foreach($companies as $company)
+                                                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                            @error('company_id') <span class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
+                                                        </div>
+
+                                                        <div>
+                                                            <label for="date" class="block text-base font-medium text-gray-700 dark:text-gray-300">Date</label>
+                                                            <input type="date" wire:model="date" id="date" required
+                                                                   class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('date') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
+
+                                                        <div>
+                                                            <label for="due_date" class="block text-base font-medium text-gray-700 dark:text-gray-300">Due Date</label>
+                                                            <input type="date" wire:model="due_date" id="due_date" required
+                                                                   class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('due_date') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
+
+                                                        <div>
+                                                            <label for="status" class="block text-base font-medium text-gray-700 dark:text-gray-300">Status</label>
+                                                            <select wire:model.live="status" id="status" required
+                                                                   class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                                <option value="draft">Draft</option>
+                                                                <option value="sent">Sent</option>
+                                                                <option value="paid">Paid</option>
+                                                                <option value="overdue">Overdue</option>
+                                                            </select>
+                                                            @error('status') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
+
+                                                        <div class="md:col-span-2">
+                                                            <label for="notes" class="block text-base font-medium text-gray-700 dark:text-gray-300">Notes</label>
+                                                            <textarea wire:model="notes" id="notes" rows="4"
+                                                                     class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3"></textarea>
+                                                            @error('notes') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
                                                     </div>
 
-                                                    <div>
-                                                        <label for="company_id" class="block text-base font-medium text-gray-700 dark:text-gray-300">Company (From)</label>
-                                                        <select wire:model="company_id" id="company_id" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                            <option value="">Select Company</option>
-                                                            @foreach($companies as $company)
-                                                                <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                        @error('company_id') <span class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
+                                                    <div class="mt-4">
+                                                        <label class="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">Time Logs</label>
+                                                        
+                                                        <!-- Current Time Logs -->
+                                                        @if($currentTimeLogs->count() > 0)
+                                                            <div class="mb-4">
+                                                                <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Time Logs</h4>
+                                                                <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
+                                                                    <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                                                                        @foreach($currentTimeLogs as $log)
+                                                                            <li class="px-4 py-4">
+                                                                                <div class="flex items-center justify-between">
+                                                                                    <div class="flex items-center">
+                                                                                        <input type="checkbox" wire:model="selectedTimeLogs" value="{{ $log->id }}" 
+                                                                                               class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                                                                        <div class="ml-3">
+                                                                                            <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                                                                {{ $log->date->format('M d, Y') }} - {{ $log->service->name }}
+                                                                                            </p>
+                                                                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                                                                                {{ $log->hours }} hours at {{ $log->location }}
+                                                                                            </p>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <button wire:click="removeTimeLog({{ $log->id }})"
+                                                                                            class="ml-4 p-2 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 rounded-full hover:bg-red-50 dark:hover:bg-red-900">
+                                                                                        <x-icons.trash class="w-5 h-5" />
+                                                                                    </button>
+                                                                                </div>
+                                                                            </li>
+                                                                        @endforeach
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        @endif
+
+                                                        <!-- Available Time Logs -->
+                                                        <div>
+                                                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Available Time Logs</h4>
+                                                            <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
+                                                                <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                                                                    @forelse($availableTimeLogs as $log)
+                                                                        @if(!$currentTimeLogs->contains($log))
+                                                                            <li class="px-4 py-4">
+                                                                                <div class="flex items-center">
+                                                                                    <input type="checkbox" wire:model="selectedTimeLogs" value="{{ $log->id }}" 
+                                                                                           class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                                                                    <div class="ml-3">
+                                                                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                                                            {{ $log->date->format('M d, Y') }} - {{ $log->service->name }}
+                                                                                        </p>
+                                                                                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                                                                                            {{ $log->hours }} hours at {{ $log->location }}
+                                                                                        </p>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </li>
+                                                                        @endif
+                                                                    @empty
+                                                                        <li class="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                                                            No available time logs to select.
+                                                                        </li>
+                                                                    @endforelse
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                        @error('selectedTimeLogs') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
                                                     </div>
 
-                                                    <div>
-                                                        <label for="date" class="block text-base font-medium text-gray-700 dark:text-gray-300">Date</label>
-                                                        <input type="date" wire:model.live="date" id="date" required
-                                                               class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('date') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                    <div class="mt-6 flex justify-end space-x-4 sticky bottom-0 bg-white dark:bg-gray-800 py-4">
+                                                        <button type="button" 
+                                                                wire:click="closeModal"
+                                                                class="inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-3 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                                            Cancel
+                                                        </button>
+                                                        <button type="submit" 
+                                                                class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                                            {{ $invoiceId ? 'Update' : 'Create' }}
+                                                        </button>
                                                     </div>
-
-                                                    <div>
-                                                        <label for="due_date" class="block text-base font-medium text-gray-700 dark:text-gray-300">Due Date</label>
-                                                        <input type="date" wire:model.live="due_date" id="due_date" required
-                                                               class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('due_date') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-
-                                                    <div>
-                                                        <label for="status" class="block text-base font-medium text-gray-700 dark:text-gray-300">Status</label>
-                                                        <select wire:model.live="status" id="status" required
-                                                               class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                            <option value="draft">Draft</option>
-                                                            <option value="sent">Sent</option>
-                                                            <option value="paid">Paid</option>
-                                                            <option value="overdue">Overdue</option>
-                                                        </select>
-                                                        @error('status') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-
-                                                    <div class="md:col-span-2">
-                                                        <label for="notes" class="block text-base font-medium text-gray-700 dark:text-gray-300">Notes</label>
-                                                        <textarea wire:model="notes" id="notes" rows="4"
-                                                                 class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3"></textarea>
-                                                        @error('notes') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-                                                </div>
-
-                                                <div class="mt-4">
-                                                    <label class="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">Select Time Logs</label>
-                                                    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
-                                                        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
-                                                            @forelse($availableTimeLogs as $log)
-                                                                <li class="px-4 py-4">
-                                                                    <div class="flex items-center">
-                                                                        <input type="checkbox" wire:model="selectedTimeLogs" value="{{ $log->id }}" 
-                                                                               class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                                                                        <div class="ml-3">
-                                                                            <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                                                                {{ $log->date->format('M d, Y') }} - {{ $log->service->name }}
-                                                                            </p>
-                                                                            <p class="text-sm text-gray-500 dark:text-gray-400">
-                                                                                {{ $log->hours }} hours at {{ $log->location }}
-                                                                            </p>
-                                                                        </div>
-                                                                    </div>
-                                                                </li>
-                                                            @empty
-                                                                <li class="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                                                    No available time logs to select.
-                                                                </li>
-                                                            @endforelse
-                                                        </ul>
-                                                    </div>
-                                                    @error('selectedTimeLogs') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                </div>
-
-                                                <div class="mt-6 flex justify-end space-x-4 sticky bottom-0 bg-white dark:bg-gray-800 py-4">
-                                                    <button type="button" 
-                                                            @click="show = false"
-                                                            class="inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-3 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                                                        Cancel
-                                                    </button>
-                                                    <button type="submit" 
-                                                            class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                                                        {{ $invoiceId ? 'Update' : 'Create' }}
-                                                    </button>
-                                                </div>
-                                            </form>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>
