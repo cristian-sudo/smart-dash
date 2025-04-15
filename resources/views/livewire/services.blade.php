@@ -114,9 +114,9 @@
                         </div>
                     </div>
 
-                    <!-- Modal -->
+                    <!-- Service Modal -->
                     @if($showModal)
-                        <div class="fixed inset-0 z-[100]">
+                        <div class="fixed inset-0 z-[200] overflow-y-auto">
                             <!-- Backdrop -->
                             <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-75" wire:click="closeModal"></div>
 

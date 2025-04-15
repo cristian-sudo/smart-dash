@@ -113,145 +113,127 @@
                     </div>
 
                     <!-- New Company Modal -->
-                    <div x-data="{ show: false }"
-                         x-cloak
-                         x-show="show"
-                         x-on:open-modal.window="show = true"
-                         x-on:keydown.escape.window="show = false"
-                         x-on:close-modal.window="show = false"
-                         class="fixed inset-0 z-[100]">
-                        
-                        <!-- Backdrop -->
-                        <div x-show="show"
-                             x-transition.opacity.duration.300ms
-                             class="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-75"
-                             @click="show = false">
-                        </div>
+                    @if($showModal)
+                        <div class="fixed inset-0 z-[200] overflow-y-auto">
+                            <!-- Backdrop -->
+                            <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-75" wire:click="closeModal"></div>
 
-                        <!-- Modal Panel -->
-                        <div class="fixed inset-0 z-[101] pointer-events-none">
-                            <div class="flex items-center justify-center min-h-screen p-4">
-                                <div x-show="show"
-                                     x-transition:enter="ease-out duration-300"
-                                     x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                                     x-transition:leave="ease-in duration-200"
-                                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                                     class="relative bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-2xl w-full max-h-[90vh] overflow-y-auto pointer-events-auto"
-                                     @click.away="show = false">
-                                    
-                                    <div class="bg-white dark:bg-gray-800 px-6 py-6">
-                                        <div class="mt-3">
-                                            <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
-                                                {{ $companyId ? 'Edit Company' : 'Add Company' }}
-                                            </h3>
-                                            <form wire:submit.prevent="save" class="mt-4 space-y-4">
-                                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                                    <div>
-                                                        <label for="name" class="block text-base font-medium text-gray-700 dark:text-gray-300">Company Name</label>
-                                                        <input type="text" wire:model="name" id="name" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('name') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-                                                    <div>
-                                                        <label for="email" class="block text-base font-medium text-gray-700 dark:text-gray-300">Email</label>
-                                                        <input type="email" wire:model="email" id="email" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('email') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-                                                    <div>
-                                                        <label for="phone" class="block text-base font-medium text-gray-700 dark:text-gray-300">Phone</label>
-                                                        <input type="text" wire:model="phone" id="phone" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('phone') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-                                                    <div>
-                                                        <label for="website" class="block text-base font-medium text-gray-700 dark:text-gray-300">Website</label>
-                                                        <input type="url" wire:model="website" id="website" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('website') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-                                                </div>
-
-                                                <div class="mt-4">
-                                                    <label for="address" class="block text-base font-medium text-gray-700 dark:text-gray-300">Address</label>
-                                                    <textarea wire:model="address" id="address" rows="3" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3"></textarea>
-                                                    @error('address') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                </div>
-
-                                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-4">
-                                                    <div>
-                                                        <label for="tax_number" class="block text-base font-medium text-gray-700 dark:text-gray-300">Tax Number</label>
-                                                        <input type="text" wire:model="tax_number" id="tax_number" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('tax_number') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-                                                    <div>
-                                                        <label for="registration_number" class="block text-base font-medium text-gray-700 dark:text-gray-300">Registration Number</label>
-                                                        <input type="text" wire:model="registration_number" id="registration_number" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('registration_number') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-                                                    <div>
-                                                        <label for="color" class="block text-base font-medium text-gray-700 dark:text-gray-300">Company Color</label>
-                                                        <div class="mt-2 flex items-center space-x-2">
-                                                            <input type="color" wire:model="color" id="color"
-                                                                   class="h-10 w-20 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300">
-                                                            <input type="text" wire:model="color" id="color_text"
-                                                                   class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 sm:text-sm"
-                                                                   placeholder="#3B82F6">
+                            <!-- Modal Panel -->
+                            <div class="fixed inset-0 z-[101] pointer-events-none">
+                                <div class="flex items-center justify-center min-h-screen p-4">
+                                    <div class="relative bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-2xl w-full max-h-[90vh] overflow-y-auto pointer-events-auto">
+                                        <div class="bg-white dark:bg-gray-800 px-6 py-6">
+                                            <div class="mt-3">
+                                                <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
+                                                    {{ $companyId ? 'Edit Company' : 'Add Company' }}
+                                                </h3>
+                                                <form wire:submit.prevent="save" class="mt-4">
+                                                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                                        <div>
+                                                            <label for="name" class="block text-base font-medium text-gray-700 dark:text-gray-300">Company Name</label>
+                                                            <input type="text" wire:model="name" id="name" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('name') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
                                                         </div>
-                                                        @error('color') <span class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
+                                                        <div>
+                                                            <label for="email" class="block text-base font-medium text-gray-700 dark:text-gray-300">Email</label>
+                                                            <input type="email" wire:model="email" id="email" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('email') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
+                                                        <div>
+                                                            <label for="phone" class="block text-base font-medium text-gray-700 dark:text-gray-300">Phone</label>
+                                                            <input type="text" wire:model="phone" id="phone" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('phone') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
+                                                        <div>
+                                                            <label for="website" class="block text-base font-medium text-gray-700 dark:text-gray-300">Website</label>
+                                                            <input type="url" wire:model="website" id="website" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('website') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <div class="mt-4">
-                                                    <label for="logo" class="block text-base font-medium text-gray-700 dark:text-gray-300">Logo</label>
-                                                    <div class="mt-2 space-y-4">
-                                                        @if($companyId && !($logo instanceof \Illuminate\Http\UploadedFile) && $logo)
-                                                            <div class="flex items-center space-x-4">
-                                                                <div class="h-16 w-16 rounded bg-gray-50 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-                                                                    <img src="{{ asset('storage/' . $logo) }}" alt="Company logo" class="h-full w-full object-cover">
-                                                                </div>
-                                                                <label class="flex items-center">
-                                                                    <input type="checkbox" wire:model="removeLogo" class="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50">
-                                                                    <span class="ml-2 text-sm text-red-600 dark:text-red-400">Remove logo</span>
-                                                                </label>
-                                                            </div>
-                                                        @endif
-                                                        @if($logo instanceof \Illuminate\Http\UploadedFile)
-                                                            <div class="flex items-center">
-                                                                <div class="h-16 w-16 rounded bg-gray-50 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-                                                                    <img src="{{ $logo->temporaryUrl() }}" alt="New logo preview" class="h-full w-full object-cover">
-                                                                </div>
-                                                                <span class="ml-4 text-sm text-gray-500 dark:text-gray-400">New logo preview</span>
-                                                            </div>
-                                                        @endif
-                                                        <input type="file" wire:model="logo" id="logo" accept="image/*" class="block w-full text-base text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-base file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900 dark:file:text-indigo-100">
-                                                        @error('logo') <span class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
+                                                    <div class="mt-4">
+                                                        <label for="address" class="block text-base font-medium text-gray-700 dark:text-gray-300">Address</label>
+                                                        <textarea wire:model="address" id="address" rows="3" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3"></textarea>
+                                                        @error('address') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
                                                     </div>
-                                                </div>
 
-                                                <div class="mt-4">
-                                                    <label class="flex items-center">
-                                                        <input type="checkbox" wire:model="is_default" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Set as default company</span>
-                                                    </label>
-                                                </div>
+                                                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-4">
+                                                        <div>
+                                                            <label for="tax_number" class="block text-base font-medium text-gray-700 dark:text-gray-300">Tax Number</label>
+                                                            <input type="text" wire:model="tax_number" id="tax_number" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('tax_number') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
+                                                        <div>
+                                                            <label for="registration_number" class="block text-base font-medium text-gray-700 dark:text-gray-300">Registration Number</label>
+                                                            <input type="text" wire:model="registration_number" id="registration_number" class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('registration_number') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
+                                                        <div>
+                                                            <label for="color" class="block text-base font-medium text-gray-700 dark:text-gray-300">Company Color</label>
+                                                            <div class="mt-2 flex items-center space-x-2">
+                                                                <input type="color" wire:model="color" id="color"
+                                                                       class="h-10 w-20 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300">
+                                                                <input type="text" wire:model="color" id="color_text"
+                                                                       class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 sm:text-sm"
+                                                                       placeholder="#3B82F6">
+                                                            </div>
+                                                            @error('color') <span class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
+                                                        </div>
+                                                    </div>
 
-                                                <div class="mt-6 flex justify-end space-x-4 sticky bottom-0 bg-white dark:bg-gray-800 py-4">
-                                                    <button type="button" 
-                                                            @click="show = false"
-                                                            class="inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-3 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                                                        Cancel
-                                                    </button>
-                                                    <button type="submit" 
-                                                            class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                                                        {{ $companyId ? 'Update' : 'Create' }}
-                                                    </button>
-                                                </div>
-                                            </form>
+                                                    <div class="mt-4">
+                                                        <label for="logo" class="block text-base font-medium text-gray-700 dark:text-gray-300">Logo</label>
+                                                        <div class="mt-2 space-y-4">
+                                                            @if($companyId && !($logo instanceof \Illuminate\Http\UploadedFile) && $logo)
+                                                                <div class="flex items-center space-x-4">
+                                                                    <div class="h-16 w-16 rounded bg-gray-50 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                                                                        <img src="{{ asset('storage/' . $logo) }}" alt="Company logo" class="h-full w-full object-cover">
+                                                                    </div>
+                                                                    <label class="flex items-center">
+                                                                        <input type="checkbox" wire:model="removeLogo" class="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50">
+                                                                        <span class="ml-2 text-sm text-red-600 dark:text-red-400">Remove logo</span>
+                                                                    </label>
+                                                                </div>
+                                                            @endif
+                                                            @if($logo instanceof \Illuminate\Http\UploadedFile)
+                                                                <div class="flex items-center">
+                                                                    <div class="h-16 w-16 rounded bg-gray-50 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                                                                        <img src="{{ $logo->temporaryUrl() }}" alt="New logo preview" class="h-full w-full object-cover">
+                                                                    </div>
+                                                                    <span class="ml-4 text-sm text-gray-500 dark:text-gray-400">New logo preview</span>
+                                                                </div>
+                                                            @endif
+                                                            <input type="file" wire:model="logo" id="logo" accept="image/*" class="block w-full text-base text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-base file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900 dark:file:text-indigo-100">
+                                                            @error('logo') <span class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="mt-4">
+                                                        <label class="flex items-center">
+                                                            <input type="checkbox" wire:model="is_default" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                                            <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Set as default company</span>
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="mt-6 flex justify-end space-x-4 sticky bottom-0 bg-white dark:bg-gray-800 py-4">
+                                                        <button type="button" 
+                                                                wire:click="closeModal"
+                                                                class="inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-3 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                                            Cancel
+                                                        </button>
+                                                        <button type="submit" 
+                                                                class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                                            {{ $companyId ? 'Update' : 'Create' }}
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>

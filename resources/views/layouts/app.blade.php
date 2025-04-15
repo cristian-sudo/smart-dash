@@ -27,10 +27,11 @@
         // Initialize AOS
         document.addEventListener('DOMContentLoaded', function() {
             AOS.init({
-                duration: 800,
-                easing: 'ease-in-out',
+                duration: 200,
+                easing: 'ease-out',
                 once: true,
-                mirror: false
+                mirror: false,
+                offset: 50
             });
         });
 
@@ -63,19 +64,19 @@
 
                         <!-- Navigation Links -->
                         <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                            <a href="#hero" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-green-400 dark:hover:text-green-400 transition duration-300 ease-in-out transform hover:scale-105">
+                            <a href="#hero" class="inline-flex items-center px-1 pt-1 text-base font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-green-400 dark:hover:text-green-400 transition duration-300 ease-in-out transform hover:scale-105">
                                 Home
                             </a>
-                            <a href="#features" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-green-400 dark:hover:text-green-400 transition duration-300 ease-in-out transform hover:scale-105">
+                            <a href="#features" class="inline-flex items-center px-1 pt-1 text-base font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-green-400 dark:hover:text-green-400 transition duration-300 ease-in-out transform hover:scale-105">
                                 Features
                             </a>
-                            <a href="#how-it-works" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-green-400 dark:hover:text-green-400 transition duration-300 ease-in-out transform hover:scale-105">
+                            <a href="#how-it-works" class="inline-flex items-center px-1 pt-1 text-base font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-green-400 dark:hover:text-green-400 transition duration-300 ease-in-out transform hover:scale-105">
                                 How It Works
                             </a>
-                            <a href="#pricing" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-green-400 dark:hover:text-green-400 transition duration-300 ease-in-out transform hover:scale-105">
+                            <a href="#pricing" class="inline-flex items-center px-1 pt-1 text-base font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-green-400 dark:hover:text-green-400 transition duration-300 ease-in-out transform hover:scale-105">
                                 Pricing
                             </a>
-                            <a href="#contact" class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-green-400 dark:hover:text-green-400 transition duration-300 ease-in-out transform hover:scale-105">
+                            <a href="#contact" class="inline-flex items-center px-1 pt-1 text-base font-medium leading-5 text-gray-900 dark:text-gray-100 hover:text-green-400 dark:hover:text-green-400 transition duration-300 ease-in-out transform hover:scale-105">
                                 Contact
                             </a>
                         </div>

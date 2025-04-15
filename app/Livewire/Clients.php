@@ -24,6 +24,7 @@ class Clients extends Component
     public $zip = '';
     public $country = '';
     public $notes = '';
+    public $showModal = false;
 
     public function mount()
     {
@@ -44,7 +45,7 @@ class Clients extends Component
     public function create()
     {
         $this->reset(['clientId', 'name', 'email', 'phone', 'address', 'city', 'state', 'zip', 'country', 'notes']);
-        $this->dispatch('open-modal');
+        $this->showModal = true;
     }
 
     public function edit(Client $client)
@@ -59,7 +60,12 @@ class Clients extends Component
         $this->zip = $client->zip;
         $this->country = $client->country;
         $this->notes = $client->notes;
-        $this->dispatch('open-modal');
+        $this->showModal = true;
+    }
+
+    public function closeModal()
+    {
+        $this->showModal = false;
     }
 
     public function save()
@@ -87,7 +93,7 @@ class Clients extends Component
             $this->showNotification('Client created successfully!');
         }
 
-        $this->dispatch('close-modal');
+        $this->showModal = false;
         $this->reset(['clientId', 'name', 'email', 'phone', 'address', 'city', 'state', 'zip', 'country', 'notes']);
     }
 

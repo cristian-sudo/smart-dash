@@ -62,7 +62,7 @@ class Companies extends Component
             'is_default',
             'removeLogo'
         ]);
-        $this->dispatch('open-modal');
+        $this->showModal = true;
     }
 
     public function edit(Company $company)
@@ -79,7 +79,25 @@ class Companies extends Component
         $this->color = $company->color;
         $this->is_default = $company->is_default;
         $this->removeLogo = false;
-        $this->dispatch('open-modal');
+        $this->showModal = true;
+    }
+
+    public function closeModal()
+    {
+        $this->showModal = false;
+        $this->reset([
+            'companyId', 
+            'name', 
+            'email', 
+            'phone', 
+            'address', 
+            'website',
+            'tax_number',
+            'registration_number',
+            'logo',
+            'is_default',
+            'removeLogo'
+        ]);
     }
 
     public function save()
@@ -141,7 +159,7 @@ class Companies extends Component
             $this->showNotification('Company created successfully!');
         }
 
-        $this->dispatch('close-modal');
+        $this->showModal = false;
         $this->reset([
             'companyId', 
             'name', 

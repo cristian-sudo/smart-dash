@@ -8,7 +8,7 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">Clients</h2>
-                        <button x-on:click="$dispatch('open-modal')"
+                        <button wire:click="create"
                                 class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:bg-indigo-700 dark:focus:bg-indigo-600 active:bg-indigo-900 dark:active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                             {{ __('New Client') }}
                         </button>
@@ -113,124 +113,105 @@
                     </div>
 
                     <!-- New Client Modal -->
-                    <div x-data="{ show: false }"
-                         x-cloak
-                         x-show="show"
-                         x-on:open-modal.window="show = true"
-                         x-on:keydown.escape.window="show = false"
-                         x-on:close-modal.window="show = false"
-                         class="fixed inset-0 z-[100]"
-                         style="display: none;">
-                        
-                        <!-- Backdrop -->
-                        <div x-show="show"
-                             x-transition.opacity.duration.300ms
-                             class="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-75"
-                             @click="show = false">
-                        </div>
+                    @if($showModal)
+                        <div class="fixed inset-0 z-[200] overflow-y-auto">
+                            <!-- Backdrop -->
+                            <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 opacity-75" wire:click="closeModal"></div>
 
-                        <!-- Modal Panel -->
-                        <div class="fixed inset-0 z-[101] pointer-events-none">
-                            <div class="flex items-center justify-center min-h-screen p-4">
-                                <div x-show="show"
-                                     x-transition:enter="ease-out duration-300"
-                                     x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                                     x-transition:leave="ease-in duration-200"
-                                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                                     class="relative bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-2xl w-full max-h-[90vh] overflow-y-auto pointer-events-auto"
-                                     @click.away="show = false">
-                                    
-                                    <div class="bg-white dark:bg-gray-800 px-6 py-6">
-                                        <div class="mt-3">
-                                            <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
-                                                {{ $clientId ? 'Edit Client' : 'Add Client' }}
-                                            </h3>
-                                            <form wire:submit.prevent="save" class="mt-4 space-y-4">
-                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    <div>
-                                                        <label for="name" class="block text-base font-medium text-gray-700 dark:text-gray-300">Name</label>
-                                                        <input type="text" wire:model.live="name" id="name" required
-                                                               class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('name') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                            <!-- Modal Panel -->
+                            <div class="fixed inset-0 z-[101] pointer-events-none">
+                                <div class="flex items-center justify-center min-h-screen p-4">
+                                    <div class="relative bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-2xl w-full max-h-[90vh] overflow-y-auto pointer-events-auto">
+                                        <div class="bg-white dark:bg-gray-800 px-6 py-6">
+                                            <div class="mt-3">
+                                                <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
+                                                    {{ $clientId ? 'Edit Client' : 'Add Client' }}
+                                                </h3>
+                                                <form wire:submit.prevent="save" class="mt-4 space-y-4">
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div>
+                                                            <label for="name" class="block text-base font-medium text-gray-700 dark:text-gray-300">Name</label>
+                                                            <input type="text" wire:model.live="name" id="name" required
+                                                                   class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('name') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
+
+                                                        <div>
+                                                            <label for="email" class="block text-base font-medium text-gray-700 dark:text-gray-300">Email</label>
+                                                            <input type="email" wire:model.live="email" id="email"
+                                                                   class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('email') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
+
+                                                        <div>
+                                                            <label for="phone" class="block text-base font-medium text-gray-700 dark:text-gray-300">Phone</label>
+                                                            <input type="text" wire:model.live="phone" id="phone"
+                                                                   class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('phone') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
+
+                                                        <div>
+                                                            <label for="address" class="block text-base font-medium text-gray-700 dark:text-gray-300">Address <span class="text-red-500">*</span></label>
+                                                            <input type="text" wire:model.live="address" id="address" required
+                                                                   class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('address') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
+
+                                                        <div>
+                                                            <label for="city" class="block text-base font-medium text-gray-700 dark:text-gray-300">City <span class="text-red-500">*</span></label>
+                                                            <input type="text" wire:model.live="city" id="city" required
+                                                                   class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('city') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
+
+                                                        <div>
+                                                            <label for="county" class="block text-base font-medium text-gray-700 dark:text-gray-300">County/State <span class="text-red-500">*</span></label>
+                                                            <input type="text" wire:model.live="state" id="county" required
+                                                                   class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('state') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
+
+                                                        <div>
+                                                            <label for="postcode" class="block text-base font-medium text-gray-700 dark:text-gray-300">Postcode/ZIP <span class="text-red-500">*</span></label>
+                                                            <input type="text" wire:model.live="zip" id="postcode" required
+                                                                   class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('zip') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
+
+                                                        <div>
+                                                            <label for="country" class="block text-base font-medium text-gray-700 dark:text-gray-300">Country <span class="text-red-500">*</span></label>
+                                                            <input type="text" wire:model.live="country" id="country" required
+                                                                   class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
+                                                            @error('country') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
+
+                                                        <div class="md:col-span-2">
+                                                            <label for="notes" class="block text-base font-medium text-gray-700 dark:text-gray-300">Notes</label>
+                                                            <textarea wire:model="notes" id="notes" rows="4"
+                                                                      class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3"></textarea>
+                                                            @error('notes') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                        </div>
                                                     </div>
 
-                                                    <div>
-                                                        <label for="email" class="block text-base font-medium text-gray-700 dark:text-gray-300">Email</label>
-                                                        <input type="email" wire:model.live="email" id="email"
-                                                               class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('email') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
+                                                    <div class="mt-6 flex justify-end space-x-4 sticky bottom-0 bg-white dark:bg-gray-800 py-4">
+                                                        <button type="button" 
+                                                                wire:click="closeModal"
+                                                                class="inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-3 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                                            Cancel
+                                                        </button>
+                                                        <button type="submit" 
+                                                                class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                                            {{ $clientId ? 'Update' : 'Create' }}
+                                                        </button>
                                                     </div>
-
-                                                    <div>
-                                                        <label for="phone" class="block text-base font-medium text-gray-700 dark:text-gray-300">Phone</label>
-                                                        <input type="text" wire:model.live="phone" id="phone"
-                                                               class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('phone') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-
-                                                    <div>
-                                                        <label for="address" class="block text-base font-medium text-gray-700 dark:text-gray-300">Address <span class="text-red-500">*</span></label>
-                                                        <input type="text" wire:model.live="address" id="address" required
-                                                               class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('address') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-
-                                                    <div>
-                                                        <label for="city" class="block text-base font-medium text-gray-700 dark:text-gray-300">City <span class="text-red-500">*</span></label>
-                                                        <input type="text" wire:model.live="city" id="city" required
-                                                               class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('city') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-
-                                                    <div>
-                                                        <label for="county" class="block text-base font-medium text-gray-700 dark:text-gray-300">County/State <span class="text-red-500">*</span></label>
-                                                        <input type="text" wire:model.live="state" id="county" required
-                                                               class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('state') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-
-                                                    <div>
-                                                        <label for="postcode" class="block text-base font-medium text-gray-700 dark:text-gray-300">Postcode/ZIP <span class="text-red-500">*</span></label>
-                                                        <input type="text" wire:model.live="zip" id="postcode" required
-                                                               class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('zip') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-
-                                                    <div>
-                                                        <label for="country" class="block text-base font-medium text-gray-700 dark:text-gray-300">Country <span class="text-red-500">*</span></label>
-                                                        <input type="text" wire:model.live="country" id="country" required
-                                                               class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3">
-                                                        @error('country') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-
-                                                    <div class="md:col-span-2">
-                                                        <label for="notes" class="block text-base font-medium text-gray-700 dark:text-gray-300">Notes</label>
-                                                        <textarea wire:model="notes" id="notes" rows="4"
-                                                                  class="mt-2 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-base p-3"></textarea>
-                                                        @error('notes') <span class="mt-2 text-sm text-red-600">{{ $message }}</span> @enderror
-                                                    </div>
-                                                </div>
-
-                                                <div class="mt-6 flex justify-end space-x-4 sticky bottom-0 bg-white dark:bg-gray-800 py-4">
-                                                    <button type="button" 
-                                                            @click="show = false"
-                                                            class="inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-3 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                                                        Cancel
-                                                    </button>
-                                                    <button type="submit" 
-                                                            class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                                                        {{ $clientId ? 'Update' : 'Create' }}
-                                                    </button>
-                                                </div>
-                                            </form>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>
