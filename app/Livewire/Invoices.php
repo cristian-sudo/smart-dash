@@ -11,6 +11,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Traits\WithNotifications;
 use App\Models\Client;
 use App\Models\Company;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\InvoiceEmail;
 
 class Invoices extends Component
 {
@@ -23,9 +25,7 @@ class Invoices extends Component
     public $name = '';
     public $selectedTimeLogs = [];
     public $message = '';
-    public $show = false;
     public $previewId = null;
-    public $notificationMessage = '';
     public $invoiceId = null;
     public $clients = [];
     public $client_id = '';
@@ -36,9 +36,11 @@ class Invoices extends Component
     public $status = 'draft';
     public $notes = '';
     public $availableTimeLogs = [];
-    public $showNotification = false;
     public $currentTimeLogs = [];
     public $timeLogsToRemove = [];
+    public $showSendModal = false;
+    public $recipientEmail = '';
+    public $defaultEmailMessage = '';
 
     protected $listeners = ['refreshInvoices' => '$refresh'];
 
@@ -138,7 +140,9 @@ class Invoices extends Component
         $data['total_hours'] = $totalHours;
         $data['total'] = $totalAmount;
 
-        if ($this->invoiceId) {
+        $isEditing = $this->invoiceId !== null;
+
+        if ($isEditing) {
             $invoice = Invoice::find($this->invoiceId);
             $invoice->update($data);
             
@@ -154,7 +158,7 @@ class Invoices extends Component
 
         $this->reset(['showModal', 'invoiceId', 'client_id', 'company_id', 'date', 'due_date', 'status', 'notes', 'selectedTimeLogs', 'timeLogsToRemove']);
         $this->loadAvailableTimeLogs();
-        $this->showNotification('Invoice ' . ($this->invoiceId ? 'updated' : 'created') . ' successfully!');
+        $this->showNotification('Invoice ' . ($isEditing ? 'updated' : 'created') . ' successfully!');
     }
 
     public function delete($id)
@@ -208,10 +212,49 @@ class Invoices extends Component
         $this->showNotification('Invoice marked as paid successfully!');
     }
 
-    public function showNotification($message)
+    public function openSendModal($id)
     {
-        $this->notificationMessage = $message;
-        $this->showNotification = true;
+        $this->invoiceId = $id;
+        $invoice = Invoice::find($id);
+        $this->recipientEmail = $invoice->client->email;
+        
+        $this->defaultEmailMessage = "Dear {$invoice->client->name},\n\n";
+        $this->defaultEmailMessage .= "Invoice Number: #{$invoice->invoice_number}\n";
+        $this->defaultEmailMessage .= "Date: " . $invoice->date->format('M d, Y') . "\n";
+        $this->defaultEmailMessage .= "Due Date: " . $invoice->due_date->format('M d, Y') . "\n";
+        $this->defaultEmailMessage .= "Total Amount: $" . number_format($invoice->total, 2) . "\n\n";
+        $this->defaultEmailMessage .= "Best regards,\n";
+        $this->defaultEmailMessage .= auth()->user()->name;
+        
+        $this->showSendModal = true;
+    }
+
+    public function closeSendModal()
+    {
+        $this->showSendModal = false;
+        $this->reset(['recipientEmail', 'defaultEmailMessage']);
+    }
+
+    public function sendInvoice()
+    {
+        $invoice = Invoice::find($this->invoiceId);
+        $pdf = PDF::loadView('dashboard.invoice-pdf', [
+            'invoice' => $invoice,
+            'timeLogs' => $invoice->timeLogs,
+            'totalHours' => $invoice->total_hours,
+            'totalAmount' => $invoice->total,
+        ]);
+
+        try {
+            Mail::to($invoice->client->email)
+                ->send(new InvoiceEmail($invoice, $pdf->output(), $this->defaultEmailMessage));
+
+            $invoice->update(['status' => 'sent']);
+            $this->closeSendModal();
+            $this->showNotification('Invoice sent successfully!');
+        } catch (\Exception $e) {
+            $this->showNotification('Failed to send invoice. Please try again.', 'error');
+        }
     }
 
     public function render()
