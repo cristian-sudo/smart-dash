@@ -1,6 +1,6 @@
 <!-- CTA Section -->
-<div class="bg-green-600 dark:bg-green-700">
-    <div class="max-w-7xl mx-auto py-16 sm:py-24 md:py-32 px-4 sm:px-6 lg:px-8 lg:flex lg:items-center lg:justify-between">
+<div class="bg-green-600 dark:bg-green-700 py-16 sm:py-24 md:py-32">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 lg:flex lg:items-center lg:justify-between">
         <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl" 
             data-aos="fade-right">
             <span class="block">Ready to get started?</span>

@@ -1,6 +1,6 @@
-<div class="flex aspect-square size-8 items-center justify-center rounded-md bg-accent-content text-accent-foreground">
-    <x-app-logo-icon class="size-5 fill-current text-white dark:text-black" />
-</div>
-<div class="ms-1 grid flex-1 text-start text-sm">
-    <span class="mb-0.5 truncate leading-none font-semibold">Laravel Starter Kit</span>
+<!-- Logo -->
+<div class="flex-shrink-0 flex items-center space-x-2">
+    <img src="{{ asset('images/logo.svg') }}" alt="Smart Dash Logo" class="h-8 w-auto block dark:hidden">
+    <img src="{{ asset('images/logo-light.svg') }}" alt="Smart Dash Logo" class="h-8 w-auto hidden dark:block">
+    <span class="text-lg font-bold text-gray-900 dark:text-white">Smart-dash</span>
 </div>

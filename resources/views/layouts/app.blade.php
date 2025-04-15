@@ -57,7 +57,8 @@
                         <!-- Logo -->
                         <div class="flex-shrink-0 flex items-center space-x-2">
                             <a href="{{ url('/') }}" class="flex items-center">
-                                <img src="{{ asset('images/logo.svg') }}" alt="Smart Dash Logo" class="h-12 w-auto">
+                                <img src="{{ asset('images/logo.svg') }}" alt="Smart Dash Logo" class="h-12 w-auto block dark:hidden">
+                                <img src="{{ asset('images/logo-light.svg') }}" alt="Smart Dash Logo" class="h-12 w-auto hidden dark:block">
                                 <span class="ml-2 text-xl font-bold text-gray-900 dark:text-white">Smart-dash</span>
                             </a>
                         </div>

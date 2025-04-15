@@ -1,8 +1,8 @@
 <!-- Hero Section -->
 <div class="relative overflow-hidden bg-white dark:bg-gray-900 py-16 sm:py-24 md:py-32">
-    <div class="max-w-7xl mx-auto">
-        <div class="relative z-10 pb-12 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
-            <main class="mt-16 mx-auto max-w-7xl px-6 sm:mt-20 sm:px-8 md:mt-24 lg:mt-28 lg:px-10 xl:mt-32">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="lg:max-w-xl">
                 <div class="sm:text-center lg:text-left space-y-8">
                     <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl">
                         <span class="block">Streamline Your</span>
@@ -24,10 +24,10 @@
                         </div>
                     </div>
                 </div>
-            </main>
+            </div>
+            <div class="relative w-full">
+                <img class="w-full h-auto object-contain max-w-lg mx-auto" src="{{ asset('images/hero-banner-image.png') }}" alt="Professional invoicing illustration" loading="lazy">
+            </div>
         </div>
-    </div>
-    <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-        <img class="h-56 w-full object-contain sm:h-64 md:h-72 lg:w-full lg:h-full max-w-2xl mx-auto" src="{{ asset('images/hero-banner-image.png') }}" alt="Professional invoicing illustration" loading="lazy">
     </div>
 </div> 
