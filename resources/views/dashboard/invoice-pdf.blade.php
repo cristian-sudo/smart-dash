@@ -209,6 +209,30 @@
             </tfoot>
         </table>
 
+        @if($products && $products->count() > 0)
+            <h3 class="text-lg font-semibold mt-6 mb-2">Products</h3>
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b">
+                        <th class="py-2">Product</th>
+                        <th class="py-2">Quantity</th>
+                        <th class="py-2">Price</th>
+                        <th class="py-2">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($products as $product)
+                        <tr class="border-b">
+                            <td class="py-2">{{ $product->name }}</td>
+                            <td class="py-2">{{ $product->pivot->quantity }}</td>
+                            <td class="py-2">${{ number_format($product->pivot->price, 2) }}</td>
+                            <td class="py-2">${{ number_format($product->pivot->quantity * $product->pivot->price, 2) }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+
         <!-- Footer -->
         <div class="footer">
             <p>Thank you for your business!</p>

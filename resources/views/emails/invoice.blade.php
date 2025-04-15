@@ -92,6 +92,30 @@
                 <p><strong>Total Amount:</strong> ${{ number_format($invoice->total, 2) }}</p>
             </div>
 
+            @if($invoice->products->count() > 0)
+                <h3 style="font-size: 18px; font-weight: 600; margin-top: 24px; margin-bottom: 8px;">Products</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid #e5e7eb;">
+                            <th style="text-align: left; padding: 8px 0;">Product</th>
+                            <th style="text-align: left; padding: 8px 0;">Quantity</th>
+                            <th style="text-align: left; padding: 8px 0;">Price</th>
+                            <th style="text-align: left; padding: 8px 0;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($invoice->products as $product)
+                            <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <td style="padding: 8px 0;">{{ $product->name }}</td>
+                                <td style="padding: 8px 0;">{{ $product->pivot->quantity }}</td>
+                                <td style="padding: 8px 0;">${{ number_format($product->pivot->price, 2) }}</td>
+                                <td style="padding: 8px 0;">${{ number_format($product->pivot->quantity * $product->pivot->price, 2) }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+
             <div class="notice">
                 <p>This is an automated message from {{ config('app.name') }}. Please do not reply to this email.</p>
                 <p>If you have any questions about this invoice, please contact {{ $invoice->company->name ?? config('app.name') }} directly.</p>

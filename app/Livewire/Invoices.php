@@ -41,6 +41,13 @@ class Invoices extends Component
     public $showSendModal = false;
     public $recipientEmail = '';
     public $defaultEmailMessage = '';
+    
+    // Add new properties for products
+    public $selectedProducts = [];
+    public $productQuantities = [];
+    public $availableProducts = [];
+    public $currentProducts = [];
+    public $productsToRemove = [];
 
     protected $listeners = ['refreshInvoices' => '$refresh'];
 
@@ -52,13 +59,23 @@ class Invoices extends Component
         $this->companies = \App\Models\Company::where('user_id', auth()->id())->get();
         $this->date = now()->format('Y-m-d');
         $this->due_date = now()->addDays(30)->format('Y-m-d');
+        $this->selectedProducts = [];
+        $this->productQuantities = [];
         $this->loadAvailableTimeLogs();
+        $this->loadAvailableProducts();
     }
 
     public function loadAvailableTimeLogs()
     {
         $this->availableTimeLogs = TimeLog::where('invoice_id', null)
             ->orWhere('invoice_id', $this->invoiceId)
+            ->get();
+    }
+
+    public function loadAvailableProducts()
+    {
+        $this->availableProducts = \App\Models\Product::where('user_id', auth()->id())
+            ->orderBy('name')
             ->get();
     }
 
@@ -70,16 +87,29 @@ class Invoices extends Component
 
     public function create()
     {
-        $this->reset(['invoiceId', 'client_id', 'company_id', 'date', 'due_date', 'status', 'notes', 'selectedTimeLogs']);
+        $this->reset([
+            'invoiceId', 
+            'client_id', 
+            'company_id', 
+            'date', 
+            'due_date', 
+            'status', 
+            'notes', 
+            'selectedTimeLogs',
+            'selectedProducts',
+            'productQuantities'
+        ]);
         $this->currentTimeLogs = collect([]);
+        $this->currentProducts = collect([]);
         $this->loadAvailableTimeLogs();
+        $this->loadAvailableProducts();
         $this->showModal = true;
     }
 
     public function edit($id)
     {
         $this->invoiceId = $id;
-        $invoice = Invoice::find($id);
+        $invoice = Invoice::with('products')->find($id);
         
         $this->client_id = $invoice->client_id;
         $this->company_id = $invoice->company_id;
@@ -92,8 +122,32 @@ class Invoices extends Component
         $this->currentTimeLogs = $invoice->timeLogs;
         $this->selectedTimeLogs = $invoice->timeLogs->pluck('id')->toArray();
         
+        // Load current products
+        $this->currentProducts = $invoice->products;
+        $this->selectedProducts = $invoice->products->pluck('id')->map(fn($id) => (string)$id)->toArray();
+        $this->productQuantities = $invoice->products->mapWithKeys(function($product) {
+            return [$product->id => $product->pivot->quantity];
+        })->toArray();
+        
         $this->loadAvailableTimeLogs();
+        $this->loadAvailableProducts();
         $this->showModal = true;
+    }
+
+    public function updatedSelectedProducts($value)
+    {
+        // Initialize quantity to 1 when a product is selected
+        foreach ($value as $productId) {
+            if (!isset($this->productQuantities[$productId])) {
+                $this->productQuantities[$productId] = 1;
+            }
+        }
+        
+        // Remove quantities for unselected products
+        $this->productQuantities = array_intersect_key(
+            $this->productQuantities, 
+            array_flip($value)
+        );
     }
 
     public function closeModal()
@@ -113,12 +167,28 @@ class Invoices extends Component
     {
         $this->validate([
             'client_id' => 'required',
-            'company_id' => 'required',
             'date' => 'required|date',
             'due_date' => 'required|date|after_or_equal:date',
-            'status' => 'required',
-            'selectedTimeLogs' => 'required|array|min:1',
+            'selectedTimeLogs' => 'array',
+            'selectedProducts' => 'array',
+            'productQuantities' => 'array',
         ]);
+
+        // Ensure selectedProducts is an array
+        $selectedProducts = is_array($this->selectedProducts) ? $this->selectedProducts : [];
+
+        // Validate product quantities against stock
+        foreach ($selectedProducts as $productId) {
+            $product = \App\Models\Product::find($productId);
+            if (!$product) continue;
+            
+            $quantity = $this->productQuantities[$productId] ?? 0;
+
+            if ($quantity > $product->stock) {
+                $this->addError("productQuantities.{$productId}", "Insufficient stock. Only {$product->stock} units available.");
+                return;
+            }
+        }
 
         $data = [
             'user_id' => auth()->id(),
@@ -130,35 +200,83 @@ class Invoices extends Component
             'notes' => $this->notes,
         ];
 
-        // Calculate total hours and total amount
-        $timeLogs = TimeLog::whereIn('id', $this->selectedTimeLogs)->with('service')->get();
-        $totalHours = $timeLogs->sum('hours');
-        $totalAmount = $timeLogs->sum(function ($log) {
-            return $log->service->calculatePriceForHours($log->hours);
-        });
-
-        $data['total_hours'] = $totalHours;
-        $data['total'] = $totalAmount;
-
-        $isEditing = $this->invoiceId !== null;
-
-        if ($isEditing) {
+        if ($this->invoiceId) {
             $invoice = Invoice::find($this->invoiceId);
             $invoice->update($data);
             
-            // First, remove all time logs from this invoice
-            TimeLog::where('invoice_id', $invoice->id)->update(['invoice_id' => null]);
-            
-            // Then, add the newly selected time logs
+            // Update time logs
+            TimeLog::whereIn('id', $this->timeLogsToRemove)->update(['invoice_id' => null]);
             TimeLog::whereIn('id', $this->selectedTimeLogs)->update(['invoice_id' => $invoice->id]);
+            
+            // Update products and reduce stock
+            $invoice->products()->detach();
+            foreach ($selectedProducts as $productId) {
+                if (isset($this->productQuantities[$productId])) {
+                    $product = \App\Models\Product::find($productId);
+                    if (!$product) continue;
+                    
+                    $quantity = $this->productQuantities[$productId];
+                    
+                    // Update stock
+                    $product->decrement('stock', $quantity);
+                    
+                    $invoice->products()->attach($productId, [
+                        'quantity' => $quantity,
+                        'price' => $product->price
+                    ]);
+                }
+            }
         } else {
             $invoice = Invoice::create($data);
+            
+            // Attach time logs
             TimeLog::whereIn('id', $this->selectedTimeLogs)->update(['invoice_id' => $invoice->id]);
+            
+            // Attach products and reduce stock
+            foreach ($selectedProducts as $productId) {
+                if (isset($this->productQuantities[$productId])) {
+                    $product = \App\Models\Product::find($productId);
+                    if (!$product) continue;
+                    
+                    $quantity = $this->productQuantities[$productId];
+                    
+                    // Update stock
+                    $product->decrement('stock', $quantity);
+                    
+                    $invoice->products()->attach($productId, [
+                        'quantity' => $quantity,
+                        'price' => $product->price
+                    ]);
+                }
+            }
         }
 
-        $this->reset(['showModal', 'invoiceId', 'client_id', 'company_id', 'date', 'due_date', 'status', 'notes', 'selectedTimeLogs', 'timeLogsToRemove']);
-        $this->loadAvailableTimeLogs();
-        $this->showNotification('Invoice ' . ($isEditing ? 'updated' : 'created') . ' successfully!');
+        // Calculate totals
+        $totalHours = TimeLog::where('invoice_id', $invoice->id)->sum('hours');
+        $totalAmount = TimeLog::where('invoice_id', $invoice->id)
+            ->with('service')
+            ->get()
+            ->sum(function ($log) {
+                return $log->service->calculatePriceForHours($log->hours);
+            });
+
+        // Add product totals
+        $productTotal = $invoice->products()
+            ->get()
+            ->sum(function ($product) use ($invoice) {
+                $pivot = $product->pivot;
+                return $pivot->price * $pivot->quantity;
+            });
+
+        $totalAmount += $productTotal;
+
+        $invoice->update([
+            'total_hours' => $totalHours,
+            'total' => $totalAmount
+        ]);
+
+        $this->closeModal();
+        $this->showNotification('Invoice saved successfully!');
     }
 
     public function delete($id)
@@ -176,9 +294,11 @@ class Invoices extends Component
     {
         $invoice = Invoice::findOrFail($id);
         $timeLogs = $invoice->timeLogs()->with('service')->orderBy('date')->get();
+        $products = $invoice->products()->get();
         
         $pdf = PDF::loadView('dashboard.invoice-pdf', [
             'timeLogs' => $timeLogs,
+            'products' => $products,
             'totalHours' => $invoice->total_hours,
             'totalAmount' => $invoice->total,
             'invoice' => $invoice
@@ -294,4 +414,9 @@ class Invoices extends Component
                 ->get(),
         ]);
     }
+
+    protected $casts = [
+        'selectedProducts' => 'array',
+        'productQuantities' => 'array',
+    ];
 }

@@ -35,6 +35,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Services Routes
         Route::get('/services', Services::class)->name('services.index');
+
+        // Products Route
+        Route::get('/products', function () {
+            return view('dashboard.products');
+        })->name('products.index');
+
         // Clients Route
         Route::get('/clients', function () {
             return view('dashboard.clients');
