@@ -39,8 +39,8 @@
 
             <div class="pt-4">
                 <button type="submit" 
-                        class="w-full flex justify-center py-4 px-6 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition duration-150 ease-in-out transform hover:scale-[1.02]">
-                    Send Message
+                        class="w-full flex justify-center py-4 px-6 inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-green-600 bg-white hover:bg-green-50 transition-all duration-300 hover:scale-105">
+                        Send Message
                 </button>
             </div>
         </div>
